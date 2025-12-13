@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Record Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- เปลี่ยนจาก Sarabun เป็น Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
+            background-color: #f3f4f6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 20px auto;
+            padding: 25mm 20mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .input-line {
+            border: none;
+            border-bottom: 1px solid #9ca3af;
+            width: 100%;
+            outline: none;
+            padding: 2px 0;
+            font-weight: 500;
+            color: #000;
+            background: transparent;
+            font-size: 16px;
+            text-align: center;
+        }
+        .input-line:focus {
+            border-bottom: 2px solid #2563eb;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid #000;
+            padding: 10px 4px;
+            vertical-align: middle !important;
+            font-size: 16px;
+        }
+        
+        /* General Cell Alignment: Center */
+        td {
+            text-align: center;
+        }
+
+        /* Specific fix: Left align the first column ONLY for tables with class .label-table */
+        .label-table td:first-child {
+            text-align: left !important;
+            padding-left: 16px;
+        }
+
+        th {
+            background-color: #e5e7eb;
+            font-weight: bold;
+            color: #000;
+            text-align: center !important; /* Headers always center */
+        }
+        
+        .checkbox-group {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .checkbox-box {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #000;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        .keep-together {
+            white-space: nowrap;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            body {
+                background: white;
+                margin: 0;
+            }
+            * {
+                color: #000 !important;
+                text-shadow: none !important;
+            }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                
+                /* ปรับระยะขอบให้เล็กลงเพื่อให้เนื้อหาพอดี 1 หน้า (Top/Bottom 15mm, Left/Right 20mm) */
+                padding: 15mm 20mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            th {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: #e5e7eb !important;
+            }
+            .input-line {
+                border-bottom: 1px solid #000 !important;
+            }
+
+            /* --- Compact Mode for Printing (บีบระยะห่างเฉพาะตอนพิมพ์) --- */
+            
+            /* ลดระยะห่างระหว่างส่วน */
+            .mb-8 { margin-bottom: 1rem !important; }
+            .mb-6 { margin-bottom: 0.75rem !important; }
+            .mb-4 { margin-bottom: 0.5rem !important; }
+            
+            /* ลด Padding ในกล่องข้อความ */
+            .p-5 { padding: 0.75rem !important; }
+            .p-6 { padding: 0.5rem !important; }
+
+            /* ลดระยะห่างใน Grid */
+            .gap-y-5 { row-gap: 0.5rem !important; }
+            .gap-6 { gap: 1rem !important; }
+            .gap-8 { gap: 1.5rem !important; }
+
+            /* ปรับขนาดหัวข้อให้เล็กลงเล็กน้อย */
+            h1 { font-size: 1.25rem !important; margin-bottom: 0.25rem !important; }
+            h2 { font-size: 1rem !important; }
+            h3 { font-size: 1rem !important; margin-bottom: 0.5rem !important; }
+
+            /* บีบตาราง */
+            td, th { padding: 6px 4px !important; }
+            table { margin-bottom: 0.75rem !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Print Button -->
+    <div class="fixed top-4 right-4 no-print z-50">
+        <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            พิมพ์เอกสาร (Print)
+        </button>
+    </div>
+
+    <!-- A4 Paper Container -->
+    <div class="a4-page flex flex-col justify-between">
+        
+        <div>
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
+                <h2 class="text-lg text-gray-600 font-normal">(Data Collection Record Sheet)</h2>
+            </div>
+
+            <!-- Section 1: General Info -->
+            <div class="mb-8 border border-black p-5 rounded-sm">
+                <!-- ลบ class border-b และ border-black ออก -->
+                <h3 class="font-bold text-lg mb-4 inline-block keep-together">1. ข้อมูลทั่วไป (General Information)</h3>
+                
+                <div class="grid grid-cols-2 gap-x-10 gap-y-5 mb-3">
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold w-24">ลำดับที่:</span>
+                        <input type="text" class="input-line">
+                    </div>
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold w-24">รหัสวิจัย:</span>
+                        <input type="text" class="input-line">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-x-10 gap-y-5 mb-3">
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold w-24">ชื่อเล่น:</span>
+                        <input type="text" class="input-line">
+                    </div>
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold w-24">อายุ:</span>
+                        <div class="flex w-full items-end">
+                            <input type="number" class="input-line">
+                            <span class="ml-2">ปี</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-x-6 gap-y-5 mt-4">
+                    <div class="flex items-center">
+                        <span class="font-semibold mr-4 w-16">เพศ:</span>
+                        <div class="checkbox-group mr-4">
+                            <div class="checkbox-box"></div> ชาย
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-box"></div> หญิง
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold mr-2">ส่วนสูง:</span>
+                        <input type="number" class="input-line">
+                        <span class="ml-2">ซม.</span>
+                    </div>
+                    <div class="flex items-end">
+                        <span class="whitespace-nowrap font-semibold mr-2">น้ำหนัก:</span>
+                        <input type="number" class="input-line">
+                        <span class="ml-2">กก.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Body Composition -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg mb-2 keep-together">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                <table class="label-table">
+                    <colgroup>
+                        <!-- ปรับสัดส่วนใหม่หลังจากลบคอลัมน์หมายเหตุ -->
+                        <col style="width: 40%;">
+                        <col style="width: 30%;">
+                        <col style="width: 30%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="keep-together">รายการ (Item)</th>
+                            <th>Trial 1 (cm)</th>
+                            <th>Trial 2 (cm)</th>
+                            <!-- ลบคอลัมน์หมายเหตุออก -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold keep-together py-3">เส้นรอบเอว (Waist)</td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold keep-together py-3">เส้นรอบสะโพก (Hip)</td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 3: Handgrip Strength -->
+            <div class="mb-8">
+                <!-- ปรับให้หัวข้อและตัวเลือกข้างถนัดอยู่ในบรรทัดเดียวกัน เพื่อประหยัดพื้นที่ -->
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-lg keep-together mb-0">3. Handgrip Strength Test</h3>
+                    <div class="flex items-center">
+                        <span class="font-semibold mr-3">ข้างที่ถนัด (Dominant):</span>
+                        <div class="checkbox-group mr-4">
+                            <div class="checkbox-box"></div> ขวา
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-box"></div> ซ้าย
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="label-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <!-- ลบ rowspan และ merged header ออก -->
+                            <th class="keep-together py-2">ข้าง (Side)</th>
+                            <th class="py-2">Trial 1 (kg)</th>
+                            <th class="py-2">Trial 2 (kg)</th>
+                            <th class="py-2">Trial 3 (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-semibold keep-together py-3">Dominant<br>(ข้างถนัด)</td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                        </tr>
+                        <tr>
+                            <td class="font-semibold keep-together py-3">Non-Dominant<br>(ไม่ถนัด)</td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 4: Back-Leg Dynamometer -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg mb-2 keep-together">4. Back-Leg Dynamometer Test</h3>
+                <table>
+                    <colgroup>
+                        <col style="width: 33.33%;">
+                        <col style="width: 33.33%;">
+                        <col style="width: 33.33%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="py-2">Trial 1 (kg)</th>
+                            <th class="py-2">Trial 2 (kg)</th>
+                            <th class="py-2">Trial 3 (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="h-14">
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 5: Cardio & CR10 -->
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2 keep-together">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
+                <div class="grid grid-cols-2 gap-8">
+                    
+                    <!-- 20M-SRT -->
+                    <div class="border border-black p-0">
+                        <div class="bg-gray-200 p-2 text-center font-bold border-b border-black">
+                            20M-SRT Test
+                        </div>
+                        <div class="p-6 text-center">
+                            <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
+                            <div class="flex justify-center items-end gap-2">
+                                <input type="text" class="input-line text-center text-2xl w-24 font-bold">
+                                <span class="mb-1 text-lg">รอบ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CR10 Scale -->
+                    <div class="border border-black p-0">
+                        <div class="bg-gray-200 p-2 text-center font-bold border-b border-black">
+                            CR10 Scale (ระดับความเหนื่อย)
+                        </div>
+                        <div class="p-6 grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <label class="block text-xs font-semibold mb-1 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
+                                <div class="flex justify-center items-center gap-1">
+                                    <input type="text" class="border border-gray-400 w-14 h-10 text-center rounded text-black">
+                                    <span class="text-black ml-1">/10</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <label class="block text-xs font-semibold mb-1 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
+                                <div class="flex justify-center items-center gap-1">
+                                    <input type="text" class="border border-gray-400 w-14 h-10 text-center rounded text-black">
+                                    <span class="text-black ml-1">/10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
