@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Individual Record Sheet</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- เปลี่ยนจาก Sarabun เป็น Prompt -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Import ทั้ง Prompt และ Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Prompt', sans-serif; /* ใช้ฟอนต์ Prompt */
+            font-family: 'Prompt', sans-serif; /* ค่าเริ่มต้นเป็น Prompt */
             background-color: #f3f4f6;
             -webkit-font-smoothing: antialiased;
+            transition: font-family 0.3s ease; /* เพิ่ม transition ให้เปลี่ยนฟอนต์นุ่มนวล */
         }
         
         .a4-page {
@@ -110,8 +111,6 @@
                 margin: 0;
                 width: 210mm;
                 height: 297mm;
-                
-                /* ปรับระยะขอบให้เล็กลงเพื่อให้เนื้อหาพอดี 1 หน้า (Top/Bottom 15mm, Left/Right 20mm) */
                 padding: 15mm 20mm;
             }
             .no-print {
@@ -126,40 +125,52 @@
                 border-bottom: 1px solid #000 !important;
             }
 
-            /* --- Compact Mode for Printing (บีบระยะห่างเฉพาะตอนพิมพ์) --- */
-            
-            /* ลดระยะห่างระหว่างส่วน */
+            /* --- Compact Mode for Printing --- */
             .mb-8 { margin-bottom: 1rem !important; }
             .mb-6 { margin-bottom: 0.75rem !important; }
             .mb-4 { margin-bottom: 0.5rem !important; }
-            
-            /* ลด Padding ในกล่องข้อความ */
             .p-5 { padding: 0.75rem !important; }
             .p-6 { padding: 0.5rem !important; }
-
-            /* ลดระยะห่างใน Grid */
             .gap-y-5 { row-gap: 0.5rem !important; }
             .gap-6 { gap: 1rem !important; }
             .gap-8 { gap: 1.5rem !important; }
-
-            /* ปรับขนาดหัวข้อให้เล็กลงเล็กน้อย */
             h1 { font-size: 1.25rem !important; margin-bottom: 0.25rem !important; }
             h2 { font-size: 1rem !important; }
             h3 { font-size: 1rem !important; margin-bottom: 0.5rem !important; }
-
-            /* บีบตาราง */
             td, th { padding: 6px 4px !important; }
             table { margin-bottom: 0.75rem !important; }
         }
     </style>
+    <script>
+        function toggleFont() {
+            const body = document.body;
+            const fontNameDisplay = document.getElementById('fontName');
+            
+            // เช็คว่าปัจจุบันใช้ Prompt หรือไม่ ถ้าใช่เปลี่ยนเป็น Sarabun ถ้าไม่ใช่กลับไป Prompt
+            if (body.style.fontFamily.includes('Sarabun')) {
+                body.style.fontFamily = "'Prompt', sans-serif";
+                fontNameDisplay.innerText = "Font: Prompt";
+            } else {
+                body.style.fontFamily = "'Sarabun', sans-serif";
+                fontNameDisplay.innerText = "Font: Sarabun";
+            }
+        }
+    </script>
 </head>
 <body>
 
-    <!-- Floating Print Button -->
-    <div class="fixed top-4 right-4 no-print z-50">
+    <!-- Floating Buttons Container -->
+    <div class="fixed top-4 right-4 no-print z-50 flex gap-3">
+        <!-- Change Font Button -->
+        <button onclick="toggleFont()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow flex items-center gap-2 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+            <span id="fontName">Font: Prompt</span>
+        </button>
+
+        <!-- Print Button -->
         <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2 transition">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            พิมพ์เอกสาร (Print)
+            พิมพ์เอกสาร
         </button>
     </div>
 
@@ -175,7 +186,6 @@
 
             <!-- Section 1: General Info -->
             <div class="mb-8 border border-black p-5 rounded-sm">
-                <!-- ลบ class border-b และ border-black ออก -->
                 <h3 class="font-bold text-lg mb-4 inline-block keep-together">1. ข้อมูลทั่วไป (General Information)</h3>
                 
                 <div class="grid grid-cols-2 gap-x-10 gap-y-5 mb-3">
@@ -231,7 +241,6 @@
                 <h3 class="font-bold text-lg mb-2 keep-together">2. สัดส่วนร่างกาย (Body Composition)</h3>
                 <table class="label-table">
                     <colgroup>
-                        <!-- ปรับสัดส่วนใหม่หลังจากลบคอลัมน์หมายเหตุ -->
                         <col style="width: 40%;">
                         <col style="width: 30%;">
                         <col style="width: 30%;">
@@ -241,7 +250,6 @@
                             <th class="keep-together">รายการ (Item)</th>
                             <th>Trial 1 (cm)</th>
                             <th>Trial 2 (cm)</th>
-                            <!-- ลบคอลัมน์หมายเหตุออก -->
                         </tr>
                     </thead>
                     <tbody>
@@ -261,7 +269,6 @@
 
             <!-- Section 3: Handgrip Strength -->
             <div class="mb-8">
-                <!-- ปรับให้หัวข้อและตัวเลือกข้างถนัดอยู่ในบรรทัดเดียวกัน เพื่อประหยัดพื้นที่ -->
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-bold text-lg keep-together mb-0">3. Handgrip Strength Test</h3>
                     <div class="flex items-center">
@@ -284,7 +291,6 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <!-- ลบ rowspan และ merged header ออก -->
                             <th class="keep-together py-2">ข้าง (Side)</th>
                             <th class="py-2">Trial 1 (kg)</th>
                             <th class="py-2">Trial 2 (kg)</th>
