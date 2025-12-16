@@ -146,7 +146,7 @@
             cursor: not-allowed;
         }
 
-        /* --- Print Media Query for A4 layout (แก้ไขให้เหมือนหน้าจอ 100%) --- */
+        /* --- Print Media Query for A4 layout (Strict Fidelity Fix) --- */
         @media print {
             @page {
                 size: A4 portrait;
@@ -155,20 +155,17 @@
             body {
                 background: white;
                 margin: 0;
-                /* บังคับใช้ขนาด font-size ของ body */
                 font-size: 16px !important; 
-            }
-            * {
-                /* บังคับพิมพ์สีพื้นหลังและเส้นขอบ */
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
             }
             .a4-page {
                 box-shadow: none;
                 margin: 0;
                 page-break-after: always;
-                width: 210mm;
-                min-height: 297mm;
+                width: 210mm !important; /* Lock A4 Width */
+                min-height: 297mm !important; 
+                height: 297mm !important; /* Lock A4 Height */
                 /* ใช้ Padding เท่ากับหน้าจอเป๊ะๆ */
                 padding: 25mm 20mm !important; 
                 border-radius: 0;
@@ -176,18 +173,17 @@
             .no-print {
                 display: none !important;
             }
-            /* ซ่อนปุ่มลบหน้าเวลาพิมพ์ */
             .delete-page-btn {
                 display: none !important;
             }
             
             /* บังคับให้ขนาดฟอนต์ของหัวข้อหลักและข้อมูลคงที่ */
-            .text-3xl { font-size: 24pt !important; } /* H1: 3rem -> approx 24pt */
-            .text-xl { font-size: 16pt !important; } /* H2/H3: 1.25rem -> approx 16pt */
-            .text-lg { font-size: 14pt !important; } /* Input labels/dropdown */
+            .text-3xl { font-size: 24pt !important; } 
+            .text-xl { font-size: 16pt !important; }
+            .text-lg { font-size: 14pt !important; }
             .text-base { font-size: 12pt !important; }
             .text-sm { font-size: 10pt !important; }
-            .font-semibold { font-weight: 600 !important; } /* Maintain font weight */
+            .font-semibold { font-weight: 600 !important; }
 
             /* ป้องกันการตัดแยกส่วนหลักข้ามหน้า */
             .mb-8, .mb-6 {
@@ -201,13 +197,12 @@
                 color: #000 !important;
             }
             
-            /* Ensure table data inputs (which are mostly text) remain centered and transparent */
+            /* Ensure table data inputs remain transparent */
             table input[type="text"], table input[type="number"] {
                 background: transparent !important;
                 text-align: center !important;
-                padding: 0 !important; /* Ensure input fits tightly */
+                padding: 0 !important; 
             }
-            /* ปรับขนาดกล่อง Input ในส่วน CR10/20M */
             .border.border-gray-400 {
                 height: 2.5rem !important;
                 font-size: 1rem !important;
@@ -261,7 +256,7 @@
             }
         }
 
-        // NEW: Function to handle Date Checkbox Sync
+        // Function to handle Date Checkbox Sync
         function syncDateCheckboxes(sourceCheckbox) {
             const isChecked = sourceCheckbox.checked;
             const allSyncCheckboxes = document.querySelectorAll('.sync-date-checkbox');
@@ -450,9 +445,7 @@
                 }
             }
             
-            updatePageNumbering(); // IMPORTANT: Update numbering after changes
-            updateDeleteButtons();
-            syncCenterSelection(); // Ensure center selection remains consistent
+            updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
         }
 
         // Function to handle the button click and input (Apply)
@@ -478,10 +471,7 @@
                 if (confirm(`ยืนยันการลบหน้า ${pageNum} หรือไม่? ข้อมูลทั้งหมดในหน้าจะถูกลบ`)) {
                     const page = buttonElement.closest('.a4-page');
                     page.remove();
-                    // Update all numbering and button states immediately
-                    updatePageNumbering();
-                    updateDeleteButtons();
-                    syncCenterSelection(); // Ensure remaining center selection is updated
+                    updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
                 }
             } else {
                 alert('ไม่สามารถลบหน้าสุดท้ายได้');
@@ -494,12 +484,10 @@
             const parentGroup = group.closest('.checkbox-control');
             const box = group.querySelector('.checkbox-box');
             
-            // Uncheck all others in the same group (radio-like behavior)
             parentGroup.querySelectorAll('.checkbox-box').forEach(otherBox => {
                 otherBox.classList.remove('checked');
             });
 
-            // Check the clicked one
             box.classList.add('checked');
         }
 
@@ -533,13 +521,12 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    // Use header: 1 to get data as array of arrays, including headers
                     const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
-                    const dataRows = json.slice(1); // Skip header row (assuming row 1 is header)
+                    const dataRows = json.slice(1); 
                     processExcelData(dataRows);
                 } catch (error) {
                     console.error("Error processing Excel file:", error);
-                    alert(`เกิดข้อผิดพลาดในการประมวลผลไฟล์ Excel: ${error.message}. กรุณาตรวจสอบว่าไฟล์ถูกต้องและไม่ได้มีการเข้ารหัส.`);
+                    alert(`เกิดข้อผิดพลาดในการประมวลผลไฟล์ Excel: ${error.message}.`);
                 }
                 event.target.value = '';
             };
@@ -560,59 +547,39 @@
                 const page = allPages[index];
                 if (!page) return;
                 
-                // Helper to get string value and trim, default to empty string
                 const getValue = (col) => (row[col] !== undefined && row[col] !== null) ? String(row[col]).trim() : '';
-                // Helper to clean and convert to number, defaulting to NaN if invalid
                 const getNumberValue = (col) => {
                     const val = getValue(col);
-                    const cleanedVal = val.replace(/[^0-9.]/g, ''); // Remove non-numeric characters except '.'
+                    const cleanedVal = val.replace(/[^0-9.]/g, ''); 
                     const num = parseFloat(cleanedVal);
                     return isNaN(num) ? NaN : num;
                 };
-                // Helper to get input by data-field attribute
                 const getInput = (field) => page.querySelector(`[data-field="${field}"]`);
 
-                // -----------------------------------------------------------
                 // 1. Calculate Average Height from Index 3 and 4
-                const height1 = getNumberValue(3); // Index 3: ส่วนสูง T1
-                const height2 = getNumberValue(4); // Index 4: ส่วนสูง T2
+                const height1 = getNumberValue(3); const height2 = getNumberValue(4);
                 let calculatedHeight = '';
-
-                const isH1Valid = !isNaN(height1);
-                const isH2Valid = !isNaN(height2);
-
-                if (isH1Valid && isH2Valid) {
-                    calculatedHeight = ((height1 + height2) / 2).toFixed(1); 
-                } else if (isH1Valid) {
-                    calculatedHeight = height1.toFixed(1);
-                } else if (isH2Valid) {
-                    calculatedHeight = height2.toFixed(1);
-                }
-                // -----------------------------------------------------------
+                if (!isNaN(height1) && !isNaN(height2)) { calculatedHeight = ((height1 + height2) / 2).toFixed(1); 
+                } else if (!isNaN(height1)) { calculatedHeight = height1.toFixed(1);
+                } else if (!isNaN(height2)) { calculatedHeight = height2.toFixed(1); }
                 
-                // 2. General Info Mapping (MAPPED TO EXCEL INDEXES):
-                // Index 0: Fullname (ชื่อจริง)
-                // Index 1: Nickname (ชื่อเล่น)
-                // Index 2: Age (อายุ)
-                const fullname = getValue(0); // Mapped to Index 0
-                const nickname = getValue(1); // Mapped to Index 1
-                const age = getValue(2); // Mapped to Index 2
-                
+                // 2. General Info Mapping
+                const fullname = getValue(0); const nickname = getValue(1); const age = getValue(2);
                 if (getInput('fullname')) { getInput('fullname').value = fullname; }
                 if (getInput('nickname')) { getInput('nickname').value = nickname; }
                 if (getInput('age')) { getInput('age').value = age.replace(/[^0-9.]/g, ''); }
                 if (getInput('height')) { getInput('height').value = calculatedHeight; } 
                 
                 // 3. Body Composition (Waist, Hip) - Columns 5 to 8
-                if (getInput('waist1')) { getInput('waist1').value = getValue(5); } // Index 5 (รอบเอว T1)
-                if (getInput('waist2')) { getInput('waist2').value = getValue(6); } // Index 6 (รอบเอว T2)
-                if (getInput('hip1')) { getInput('hip1').value = getValue(7); }    // Index 7 (สะโพก T1)
-                if (getInput('hip2')) { getInput('hip2').value = getValue(8); }    // Index 8 (สะโพก T2)
+                if (getInput('waist1')) { getInput('waist1').value = getValue(5); }
+                if (getInput('waist2')) { getInput('waist2').value = getValue(6); }
+                if (getInput('hip1')) { getInput('hip1').value = getValue(7); }
+                if (getInput('hip2')) { getInput('hip2').value = getValue(8); }
 
                 // 4. Fitness Tests (20M, CR10) - Columns 9 to 11
-                if (getInput('20m-laps')) { getInput('20m-laps').value = getValue(9); } // Index 9 (20M)
-                if (getInput('cr10-cardio')) { getInput('cr10-cardio').value = getValue(10); } // Index 10 (CR10 Cardio)
-                if (getInput('cr10-muscle')) { getInput('cr10-muscle').value = getValue(11); } // Index 11 (CR10 Muscle)
+                if (getInput('20m-laps')) { getInput('20m-laps').value = getValue(9); }
+                if (getInput('cr10-cardio')) { getInput('cr10-cardio').value = getValue(10); }
+                if (getInput('cr10-muscle')) { getInput('cr10-muscle').value = getValue(11); }
             });
 
             alert(`นำเข้าข้อมูลสำเร็จ: พบ ${importedCount} รายการ และได้เติมข้อมูลทั้งหมดลงในเอกสาร ${importedCount} หน้าเรียบร้อยแล้ว`);
@@ -622,16 +589,10 @@
 
         // Initialize event listeners and page count on load
         window.onload = () => {
-            // Initial setup for pages: ensure we start with 1 page and initialize controls
             setTotalPages(1); 
-            
-             // Attach click listeners for checkboxes on initial load (must be done after setTotalPages(1) creates the first page)
              document.querySelectorAll('.checkbox-option').forEach(el => {
                 el.addEventListener('click', (e) => {
-                    // Prevent clicks on inputs/spans inside the group from triggering the toggle
-                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') {
-                         toggleCheckbox(el);
-                    }
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') { toggleCheckbox(el); }
                 });
             });
         };
@@ -731,7 +692,7 @@
                         type="date" 
                         class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
                         onchange="handleDateChange(this)" 
-                        style="height: 100%; border: none;"
+                        style="height: 100%; border: none; z-index: 10;"
                     >
                 </div>
             </div>
