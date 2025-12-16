@@ -63,7 +63,6 @@
             font-size: 16px;
             text-align: left;
             appearance: none;
-            /* FIX: Remove cursor: default to ensure transparent overlay controls cursor */
         }
         .input-date:focus {
              border-bottom: 2px solid #2563eb;
@@ -156,7 +155,8 @@
             body {
                 background: white;
                 margin: 0;
-                font-size: 16px; /* บังคับให้ใช้ขนาดฟอนต์เดียวกับหน้าจอ */
+                /* บังคับใช้ขนาด font-size ของ body */
+                font-size: 16px !important; 
             }
             * {
                 /* บังคับพิมพ์สีพื้นหลังและเส้นขอบ */
@@ -181,6 +181,14 @@
                 display: none !important;
             }
             
+            /* บังคับให้ขนาดฟอนต์ของหัวข้อหลักและข้อมูลคงที่ */
+            .text-3xl { font-size: 24pt !important; } /* H1: 3rem -> approx 24pt */
+            .text-xl { font-size: 16pt !important; } /* H2/H3: 1.25rem -> approx 16pt */
+            .text-lg { font-size: 14pt !important; } /* Input labels/dropdown */
+            .text-base { font-size: 12pt !important; }
+            .text-sm { font-size: 10pt !important; }
+            .font-semibold { font-weight: 600 !important; } /* Maintain font weight */
+
             /* ป้องกันการตัดแยกส่วนหลักข้ามหน้า */
             .mb-8, .mb-6 {
                 page-break-inside: avoid;
@@ -199,10 +207,9 @@
                 text-align: center !important;
                 padding: 0 !important; /* Ensure input fits tightly */
             }
-
-            /* ปรับขนาดกล่อง Input ในส่วน CR10/20M (ถ้าจำเป็น) */
+            /* ปรับขนาดกล่อง Input ในส่วน CR10/20M */
             .border.border-gray-400 {
-                height: 2.5rem !important; /* ใช้ความสูงมาตรฐาน หรือปรับให้เหมาะสม */
+                height: 2.5rem !important;
                 font-size: 1rem !important;
             }
         }
