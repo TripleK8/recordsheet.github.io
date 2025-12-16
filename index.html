@@ -12,21 +12,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Base styles using Sarabun exclusively */
+        html, body {
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Sarabun', sans-serif; /* ตั้งค่า Font เป็น Sarabun เท่านั้น */
+            font-family: 'Sarabun', sans-serif;
             background-color: #f3f4f6;
             -webkit-font-smoothing: antialiased;
-            color: #1f2937; /* Default text color */
+            color: #1f2937;
+            
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
         
         .a4-page {
             width: 210mm;
             min-height: 297mm;
             background: white;
-            margin: 20px auto;
+            margin: 0 auto; 
             padding: 25mm 20mm; /* หน้าจอปกติ */
             box-shadow: 0 0 15px rgba(0,0,0,0.15);
-            position: relative; /* สำคัญสำหรับปุ่มลบหน้า */
+            position: relative;
             box-sizing: border-box;
             border-radius: 8px;
         }
@@ -135,8 +148,8 @@
         /* Delete Button Position */
         .a4-page .delete-page-btn {
             position: absolute;
-            top: 15mm; /* Inside the top padding */
-            left: 15mm; /* Inside the left padding */
+            top: 15mm; 
+            left: 15mm; 
             z-index: 20;
             padding: 6px 10px;
             opacity: 1;
@@ -159,16 +172,21 @@
                 font-size: 16px !important; 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
+                display: block; /* ยกเลิก flexbox เมื่อพิมพ์ */
+                padding: 0 !important;
             }
             .a4-page {
                 box-shadow: none;
                 margin: 0;
                 page-break-after: always;
-                width: 210mm !important; /* Lock A4 Width */
+                width: 210mm !important; 
+                /* CRITICAL FIX: ใช้ height: auto และ min-height: 297mm */
                 min-height: 297mm !important; 
-                height: 297mm !important; /* Lock A4 Height */
-                /* ใช้ Padding เท่ากับหน้าจอเป๊ะๆ */
-                padding: 25mm 20mm !important; 
+                height: auto !important; 
+                overflow: hidden !important; 
+                
+                /* ปรับ Padding ตามข้อกำหนด (20mm บน/ล่าง, 15mm ซ้าย/ขวา) */
+                padding: 20mm 15mm !important; 
                 border-radius: 0;
             }
             .no-print {
@@ -178,7 +196,7 @@
                 display: none !important;
             }
             
-            /* บังคับให้ขนาดฟอนต์ของหัวข้อหลักและข้อมูลคงที่ */
+            /* --- 1. การควบคุมขนาด Font สำหรับพิมพ์ --- */
             .text-3xl { font-size: 24pt !important; } 
             .text-xl { font-size: 16pt !important; }
             .text-lg { font-size: 14pt !important; }
@@ -186,35 +204,103 @@
             .text-sm { font-size: 10pt !important; }
             .font-semibold { font-weight: 600 !important; }
 
-            /* ป้องกันการตัดแยกส่วนหลักข้ามหน้า */
-            .mb-8, .mb-6 {
-                page-break-inside: avoid;
+            /* --- 2. การลดระยะห่าง (Margin/Padding) เพื่อบีบอัดเนื้อหาในโหมดพิมพ์ (COMPRESSED) --- */
+            /* ลด Margin หลักของ Section */
+            .mb-8 { 
+                margin-bottom: 0.75rem !important; /* COMPRESSED: ลดเป็น 12px */
+                page-break-inside: avoid !important; /* Ensure it stays together */
+            }
+            .mb-6 { 
+                margin-bottom: 0.5rem !important; /* COMPRESSED: ลดเป็น 8px */
+                page-break-inside: avoid !important; 
+            }
+            /* ลด Margin ย่อย */
+            .mb-4 {
+                margin-bottom: 0.5rem !important; 
+            }
+            .mb-3 {
+                margin-bottom: 0.3rem !important; /* COMPRESSED: ลดลงอีก */
+            }
+            /* ลด Padding/Margin ในส่วน Header Info (วันที่/ศูนย์) */
+            .header-info {
+                margin-bottom: 0.5rem !important; /* COMPRESSED: ลดลง */
             }
 
-            /* ตรวจสอบเส้นขอบให้เหมือนหน้าจอ */
+            /* ลด Padding ใน Section 1: General Info (p-5 ใน HTML) */
+            .a4-page div.border.border-black.p-5 {
+                padding: 0.75rem !important; /* COMPRESSED: ลดจาก 1.25rem */
+            }
+
+            /* ลด Padding ใน Table Cells เพื่อประหยัดพื้นที่แนวตั้ง */
+            table th, table td {
+                padding: 5px 3px !important; 
+                height: auto !important;
+            }
+            /* ลดความสูงของแถว Back-Leg Dynamometer */
+            .h-14 {
+                height: 3rem !important; 
+            }
+            
+            /* --- 3. การป้องกันการตัดแยกส่วนหลัก (Page Break Inside) --- */
+            /* ใช้ page-break-inside: avoid!important บนองค์ประกอบที่สำคัญทั้งหมด */
+            /* ส่วนของ Section ที่เป็น div ย่อย (Section 1, 2, 3, 4, 5) และ Table */
+            .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
+                page-break-inside: avoid !important;
+            }
+
+            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES (คงเดิม) --- */
             .input-line, .input-date, select {
                 border-bottom: 1px solid #9ca3af !important;
                 background-color: transparent !important;
                 color: #000 !important;
+                border-bottom-width: 1px !important; 
             }
             
-            /* Ensure table data inputs remain transparent */
             table input[type="text"], table input[type="number"] {
                 background: transparent !important;
                 text-align: center !important;
                 padding: 0 !important; 
+                border: none !important;
             }
+            
+            .trainingCenterSelect {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: transparent;
+            }
+            
+            .checkbox-box {
+                border: 1px solid #000 !important;
+            }
+            .checkbox-box.checked::after {
+                content: '✓' !important;
+                color: #000 !important;
+                -webkit-text-fill-color: #000 !important; 
+            }
+            .checkbox-option input[type="radio"], 
+            .checkbox-option input[type="checkbox"] {
+                display: none !important;
+            }
+
             .border.border-gray-400 {
+                border-color: #000 !important;
                 height: 2.5rem !important;
                 font-size: 1rem !important;
             }
         }
 
-        /* Mobile Optimization */
+        /* Mobile Optimization (คงเดิม) */
         @media (max-width: 768px) {
+            body {
+                align-items: flex-start; 
+                display: block;
+                padding: 10px;
+            }
             .a4-page {
                 width: 95%;
                 padding: 15px;
+                margin: 0 auto 20px auto;
             }
             .grid-cols-2, .grid-cols-3 {
                 grid-template-columns: 1fr;
@@ -511,6 +597,8 @@
                     }
 
                     // Re-run radio logic on clone to ensure visuals match state
+                    // Since clearPageInputs already runs and unchecks everything, 
+                    // this block is now redundant, but kept as a safeguard.
                     newPage.querySelectorAll('.checkbox-option').forEach(label => {
                         const radio = label.querySelector('input[type="radio"]');
                         const box = label.querySelector('.checkbox-box');
@@ -710,13 +798,7 @@
                 });
             });
 
-            // Set default checked state for the first radio options on the first page load (e.g., Male/Right)
-            document.querySelectorAll('.a4-page:first-child .checkbox-control').forEach(control => {
-                const firstRadio = control.querySelector('input[type="radio"]:first-of-type');
-                if (firstRadio) {
-                    toggleRadio(firstRadio.closest('.checkbox-option'));
-                }
-            });
+            // *** ส่วนนี้ถูกลบออกเพื่อให้ไม่มีการเลือกค่าเริ่มต้นสำหรับ เพศ และ ข้างที่ถนัด ***
         };
     </script>
 </head>
@@ -837,7 +919,7 @@
 
                 <!-- Section 1: General Info -->
                 <div class="mb-8 border border-black p-5 rounded-md">
-                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information)</h3>
+                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                         <div class="flex items-end">
