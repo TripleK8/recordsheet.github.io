@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Individual Record Sheet</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Import ทั้ง Prompt และ Sarabun -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Import Sarabun font (Google Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Base styles using Sarabun exclusively */
         body {
-            font-family: 'Prompt', sans-serif; /* ค่าเริ่มต้นเป็น Prompt */
+            font-family: 'Sarabun', sans-serif; /* ตั้งค่า Font เป็น Sarabun เท่านั้น */
             background-color: #f3f4f6;
             -webkit-font-smoothing: antialiased;
-            transition: font-family 0.3s ease; /* เพิ่ม transition ให้เปลี่ยนฟอนต์นุ่มนวล */
+            color: #1f2937; /* Default text color */
         }
         
         .a4-page {
@@ -21,11 +23,13 @@
             background: white;
             margin: 20px auto;
             padding: 25mm 20mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            position: relative; /* สำคัญสำหรับปุ่มลบหน้า */
             box-sizing: border-box;
+            border-radius: 8px;
         }
 
+        /* Input field styling for the underscore effect */
         .input-line {
             border: none;
             border-bottom: 1px solid #9ca3af;
@@ -37,9 +41,30 @@
             background: transparent;
             font-size: 16px;
             text-align: center;
+            transition: border-bottom-color 0.2s;
         }
         .input-line:focus {
             border-bottom: 2px solid #2563eb;
+        }
+
+        /* Styling for Date Input (to look like input-line) */
+        .input-date {
+            font-family: inherit;
+            border: none;
+            border-bottom: 1px solid #9ca3af;
+            outline: none;
+            padding: 2px 0;
+            padding-left: 5px;
+            font-weight: 500;
+            color: #000;
+            background: transparent;
+            font-size: 16px;
+            text-align: left;
+            appearance: none;
+            cursor: default; /* Use default cursor on visible display */
+        }
+        .input-date:focus {
+             border-bottom: 2px solid #2563eb;
         }
 
         /* Table Styling */
@@ -52,9 +77,9 @@
         
         th, td {
             border: 1px solid #000;
-            padding: 10px 4px;
-            vertical-align: middle !important;
-            font-size: 16px;
+            padding: 8px 4px;
+            vertical-align: middle;
+            font-size: 15px;
         }
         
         /* General Cell Alignment: Center */
@@ -65,20 +90,21 @@
         /* Specific fix: Left align the first column ONLY for tables with class .label-table */
         .label-table td:first-child {
             text-align: left !important;
-            padding-left: 16px;
+            padding-left: 12px;
         }
 
         th {
             background-color: #e5e7eb;
             font-weight: bold;
             color: #000;
-            text-align: center !important; /* Headers always center */
+            text-align: center !important;
         }
         
         .checkbox-group {
             display: inline-flex;
             gap: 10px;
             align-items: center;
+            cursor: pointer;
         }
         .checkbox-box {
             width: 18px;
@@ -86,13 +112,40 @@
             border: 1px solid #000;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 6px;
+            margin-right: 4px;
+            background-color: white;
+            position: relative;
+        }
+        .checkbox-box.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            color: #000;
         }
 
         .keep-together {
             white-space: nowrap;
         }
+        
+        /* Delete Button Position */
+        .a4-page .delete-page-btn {
+            position: absolute;
+            top: 15mm; /* Inside the top padding */
+            left: 15mm; /* Inside the left padding */
+            z-index: 20;
+            padding: 6px 10px;
+            opacity: 1;
+            cursor: pointer;
+        }
+        .a4-page .delete-page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
+        /* --- Print Media Query for A4 layout --- */
         @media print {
             @page {
                 size: A4 portrait;
@@ -101,17 +154,21 @@
             body {
                 background: white;
                 margin: 0;
+                font-size: 12pt;
             }
             * {
                 color: #000 !important;
                 text-shadow: none !important;
+                box-shadow: none !important;
             }
             .a4-page {
                 box-shadow: none;
                 margin: 0;
+                page-break-after: always;
                 width: 210mm;
                 height: 297mm;
                 padding: 15mm 20mm;
+                border-radius: 0;
             }
             .no-print {
                 display: none !important;
@@ -121,130 +178,334 @@
                 print-color-adjust: exact;
                 background-color: #e5e7eb !important;
             }
-            .input-line {
+            .input-line, .input-date {
                 border-bottom: 1px solid #000 !important;
             }
-
-            /* --- Compact Mode for Printing --- */
-            .mb-8 { margin-bottom: 1rem !important; }
-            .mb-6 { margin-bottom: 0.75rem !important; }
-            .mb-4 { margin-bottom: 0.5rem !important; }
-            .p-5 { padding: 0.75rem !important; }
-            .p-6 { padding: 0.5rem !important; }
-            .gap-y-5 { row-gap: 0.5rem !important; }
-            .gap-6 { gap: 1rem !important; }
-            .gap-8 { gap: 1.5rem !important; }
+            /* --- Compact Print Mode Adjustments --- */
             h1 { font-size: 1.25rem !important; margin-bottom: 0.25rem !important; }
             h2 { font-size: 1rem !important; }
             h3 { font-size: 1rem !important; margin-bottom: 0.5rem !important; }
-            td, th { padding: 6px 4px !important; }
-            table { margin-bottom: 0.75rem !important; }
+            td, th { padding: 4px 4px !important; font-size: 14px; }
+            table { margin-bottom: 0.5rem !important; }
+            .mb-8 { margin-bottom: 0.5rem !important; }
+            .mb-6 { margin-bottom: 0.5rem !important; }
+            .mb-4 { margin-bottom: 0.25rem !important; }
+            .p-5 { padding: 0.5rem !important; }
+            .p-6 { padding: 0.5rem !important; }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .a4-page {
+                width: 95%;
+                padding: 15px;
+            }
+            .grid-cols-2, .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            .delete-page-btn {
+                top: 10px !important;
+                left: 10px !important;
+            }
+            .fixed.top-4.right-4 {
+                top: 10px;
+                right: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
     <script>
-        function toggleFont() {
-            const body = document.body;
-            const fontNameDisplay = document.getElementById('fontName');
-            
-            // เช็คว่าปัจจุบันใช้ Prompt หรือไม่ ถ้าใช่เปลี่ยนเป็น Sarabun ถ้าไม่ใช่กลับไป Prompt
-            if (body.style.fontFamily.includes('Sarabun')) {
-                body.style.fontFamily = "'Prompt', sans-serif";
-                fontNameDisplay.innerText = "Font: Prompt";
-            } else {
-                body.style.fontFamily = "'Sarabun', sans-serif";
-                fontNameDisplay.innerText = "Font: Sarabun";
+        // Thai month abbreviations for date formatting
+        const THAI_MONTHS_SHORT = [
+            "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", 
+            "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+        ];
+
+        // Function to convert ISO date string to Thai format (D M. YYYY BE)
+        function formatDateToThai(isoDateString) {
+            if (!isoDateString) return '';
+            try {
+                const date = new Date(isoDateString);
+                if (isNaN(date.getTime())) return 'Invalid Date'; 
+
+                const day = date.getDate();
+                const monthThai = THAI_MONTHS_SHORT[date.getMonth()];
+                // Thai year is Buddhist Era (BE) = Gregorian (CE) + 543
+                const yearThai = date.getFullYear() + 543; 
+
+                return `${day} ${monthThai} ${yearThai}`;
+            } catch (e) {
+                console.error("Date formatting error:", e);
+                return '';
             }
         }
+
+        // Function to handle date change for ANY date picker (uses element reference)
+        function handleDateChange(hiddenInput) {
+            const isoDateString = hiddenInput.value;
+            const dateContainer = hiddenInput.closest('.date-control');
+            const displayInput = dateContainer.querySelector('.testDateDisplay');
+            
+            if (displayInput) {
+                displayInput.value = formatDateToThai(isoDateString);
+            }
+        }
+
+        // Function to set today's date on a specific date control container
+        function initializeDateControl(controlElement) {
+            const today = new Date().toISOString().split('T')[0];
+            const hiddenInput = controlElement.querySelector('.testDateHidden');
+            
+            if (hiddenInput) {
+                hiddenInput.value = today;
+                handleDateChange(hiddenInput);
+            }
+        }
+        
+        // Function to clear all interactive fields (inputs and checkboxes) on a cloned element
+        function clearPageInputs(pageElement) {
+            // Clear text/number inputs
+            pageElement.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+
+            // Clear checkboxes/radios (uncheck all)
+            pageElement.querySelectorAll('.checkbox-box').forEach(box => {
+                box.classList.remove('checked');
+            });
+        }
+
+        // Updates the disable state of delete buttons across all pages
+        function updateDeleteButtons() {
+            const allPages = document.querySelectorAll('.a4-page');
+            const deleteButtons = document.querySelectorAll('.delete-page-btn');
+            const isSinglePage = allPages.length === 1;
+
+            deleteButtons.forEach(btn => {
+                btn.disabled = isSinglePage;
+                btn.title = isSinglePage ? 'ไม่สามารถลบหน้าสุดท้ายได้' : 'ลบหน้านี้';
+            });
+
+            // Ensure input reflects actual count
+            document.getElementById('pageCountInput').value = allPages.length;
+        }
+
+        // Function to set the total number of pages
+        function setTotalPages(targetCount) {
+            const existingPages = document.querySelectorAll('.a4-page');
+            const currentCount = existingPages.length;
+
+            if (targetCount === currentCount) return;
+
+            // Remove excess pages
+            if (targetCount < currentCount) {
+                for (let i = currentCount; i > targetCount; i--) {
+                    existingPages[i - 1].remove();
+                }
+            } 
+            // Add missing pages
+            else if (targetCount > currentCount) {
+                // Find a template page (usually the first one, but take the last one in case any data was entered there)
+                const pageTemplate = existingPages[existingPages.length - 1] || existingPages[0]; 
+                
+                for (let i = currentCount; i < targetCount; i++) {
+                    const newPage = pageTemplate.cloneNode(true);
+                    
+                    // Clear inputs and set date to today for the new page
+                    clearPageInputs(newPage);
+                    initializeDateControl(newPage.querySelector('.date-control'));
+
+                    // Insert the new page after the last one
+                    const allPagesAfterRemoval = document.querySelectorAll('.a4-page');
+                    const lastPage = allPagesAfterRemoval[allPagesAfterRemoval.length - 1];
+                    lastPage.after(newPage);
+                }
+            }
+            
+            updateDeleteButtons();
+        }
+
+        // Function to handle the button click and input (Apply)
+        function applyPageCount() {
+            const input = document.getElementById('pageCountInput');
+            let count = parseInt(input.value);
+
+            if (isNaN(count) || count < 1) {
+                count = 1;
+                input.value = 1;
+            }
+
+            setTotalPages(count);
+        }
+
+        // Function to handle removing a specific page
+        function deletePage(buttonElement) {
+            const allPages = document.querySelectorAll('.a4-page');
+            
+            if (allPages.length > 1) {
+                if (confirm('ยืนยันการลบหน้านี้? ข้อมูลทั้งหมดในหน้าจะถูกลบ')) {
+                    const page = buttonElement.closest('.a4-page');
+                    page.remove();
+                    updateDeleteButtons();
+                }
+            } else {
+                alert('ไม่สามารถลบหน้าสุดท้ายได้');
+            }
+        }
+        
+        // Function to handle checkbox interaction (for visual feedback)
+        function toggleCheckbox(element) {
+            const group = element.closest('.checkbox-option');
+            const parentGroup = group.closest('.checkbox-control');
+            const box = group.querySelector('.checkbox-box');
+            
+            // Uncheck all others in the same group (radio-like behavior)
+            parentGroup.querySelectorAll('.checkbox-box').forEach(otherBox => {
+                otherBox.classList.remove('checked');
+            });
+
+            // Check the clicked one
+            box.classList.add('checked');
+        }
+
+        // Initialize event listeners and page count on load
+        window.onload = () => {
+            // Initial setup for pages: ensure we start with 1 page and initialize controls
+            setTotalPages(1); 
+            
+             // Attach click listeners for checkboxes on initial load (must be done after setTotalPages(1) creates the first page)
+             document.querySelectorAll('.checkbox-option').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    // Prevent clicks on inputs/spans inside the group from triggering the toggle
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') {
+                         toggleCheckbox(el);
+                    }
+                });
+            });
+        };
     </script>
 </head>
 <body>
 
     <!-- Floating Buttons Container -->
-    <div class="fixed top-4 right-4 no-print z-50 flex gap-3">
-        <!-- Change Font Button -->
-        <button onclick="toggleFont()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow flex items-center gap-2 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
-            <span id="fontName">Font: Prompt</span>
-        </button>
+    <div class="fixed top-4 right-4 no-print z-50 flex flex-col items-end gap-3">
+        
+        <!-- Page Control Input (Set Total Pages) -->
+        <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex items-center gap-2">
+            <label for="pageCountInput" class="text-sm font-semibold text-gray-700 whitespace-nowrap">จำนวนหน้าทั้งหมด:</label>
+            <input type="number" id="pageCountInput" value="1" min="1" class="w-12 text-center border rounded-md p-1 text-gray-800" style="outline: none; border-color: #d1d5db;">
+            <button onclick="applyPageCount()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm">
+                ปรับใช้
+            </button>
+        </div>
 
         <!-- Print Button -->
-        <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded shadow flex items-center gap-2 transition">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-xl flex items-center gap-2 transition">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             พิมพ์เอกสาร
         </button>
     </div>
 
     <!-- A4 Paper Container -->
-    <div class="a4-page flex flex-col justify-between">
+    <div class="a4-page flex flex-col">
         
+        <!-- Delete Page Button (Absolute position, Top-Left) -->
+        <button onclick="deletePage(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-md shadow-lg transition delete-page-btn no-print" title="ลบหน้านี้">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            ลบหน้า
+        </button>
+
+        <!-- Document Content -->
         <div>
             <!-- Header -->
             <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold uppercase tracking-wider mb-1">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
-                <h2 class="text-lg text-gray-600 font-normal">(Data Collection Record Sheet)</h2>
+                <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
+                <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
             </div>
 
-            <!-- Training Center Name (Added as requested) -->
-            <div class="mb-6 flex items-end justify-center px-4">
-                <span class="font-bold text-lg mr-2 whitespace-nowrap">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
-                <input type="text" class="input-line flex-1 text-center font-bold text-lg" placeholder="">
+            <!-- Training Center Name -->
+            <div class="mb-4 flex items-end justify-center px-4 header-info">
+                <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
+                <input type="text" class="input-line flex-1 text-center font-bold text-lg" placeholder="ชื่อศูนย์ฯ">
+            </div>
+
+            <!-- Test Date Selector (Updated to use Classes for cloning support) -->
+            <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
+                <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
+                <!-- Custom Date Input with Icon -->
+                <div class="relative w-40 flex items-center">
+                    <!-- Visible Input for Thai Format (pr-8 for icon space) -->
+                    <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี">
+                    
+                    <!-- Calendar Icon (Visual only) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    
+                    <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
+                    <input 
+                        type="date" 
+                        class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
+                        onchange="handleDateChange(this)" 
+                        style="height: 100%; border: none;"
+                    >
+                </div>
             </div>
 
             <!-- Section 1: General Info -->
-            <div class="mb-8 border border-black p-5 rounded-sm">
-                <h3 class="font-bold text-lg mb-4 inline-block keep-together">1. ข้อมูลทั่วไป (General Information)</h3>
+            <div class="mb-8 border border-black p-5 rounded-md">
+                <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information)</h3>
                 
-                <div class="grid grid-cols-2 gap-x-10 gap-y-5 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24">ลำดับที่:</span>
+                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
                         <input type="text" class="input-line">
                     </div>
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24">รหัสวิจัย:</span>
+                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
                         <input type="text" class="input-line">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-x-10 gap-y-5 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24">ชื่อเล่น:</span>
+                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
                         <input type="text" class="input-line">
                     </div>
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24">อายุ:</span>
+                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
                         <div class="flex w-full items-end">
                             <input type="number" class="input-line">
-                            <span class="ml-2">ปี</span>
+                            <span class="ml-2 text-gray-700">ปี</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-x-6 gap-y-5 mt-4">
-                    <div class="flex items-center">
-                        <span class="font-semibold mr-4 w-16">เพศ:</span>
-                        <div class="checkbox-group mr-4">
-                            <div class="checkbox-box"></div> ชาย
-                        </div>
-                        <div class="checkbox-group">
-                            <div class="checkbox-box"></div> หญิง
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
+                    <div class="flex items-center checkbox-control">
+                        <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
+                        <label class="checkbox-group mr-4 checkbox-option">
+                            <span class="checkbox-box"></span> ชาย
+                        </label>
+                        <label class="checkbox-group checkbox-option">
+                            <span class="checkbox-box"></span> หญิง
+                        </label>
                     </div>
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold mr-2">ส่วนสูง:</span>
+                        <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
                         <input type="number" class="input-line">
-                        <span class="ml-2">ซม.</span>
+                        <span class="ml-2 text-gray-700">ซม.</span>
                     </div>
                     <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold mr-2">น้ำหนัก:</span>
+                        <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
                         <input type="number" class="input-line">
-                        <span class="ml-2">กก.</span>
+                        <span class="ml-2 text-gray-700">กก.</span>
                     </div>
                 </div>
             </div>
 
             <!-- Section 2: Body Composition -->
             <div class="mb-8">
-                <h3 class="font-bold text-lg mb-2 keep-together">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
                 <table class="label-table">
                     <colgroup>
                         <col style="width: 40%;">
@@ -260,12 +521,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="font-semibold keep-together py-3">เส้นรอบเอว (Waist)</td>
+                            <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                         </tr>
                         <tr>
-                            <td class="font-semibold keep-together py-3">เส้นรอบสะโพก (Hip)</td>
+                            <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                         </tr>
@@ -275,16 +536,16 @@
 
             <!-- Section 3: Handgrip Strength -->
             <div class="mb-8">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-bold text-lg keep-together mb-0">3. Handgrip Strength Test</h3>
-                    <div class="flex items-center">
-                        <span class="font-semibold mr-3">ข้างที่ถนัด (Dominant):</span>
-                        <div class="checkbox-group mr-4">
-                            <div class="checkbox-box"></div> ขวา
-                        </div>
-                        <div class="checkbox-group">
-                            <div class="checkbox-box"></div> ซ้าย
-                        </div>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
+                    <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
+                    <div class="flex items-center checkbox-control">
+                        <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
+                        <label class="checkbox-group mr-4 checkbox-option">
+                            <span class="checkbox-box"></span> ขวา
+                        </label>
+                        <label class="checkbox-group checkbox-option">
+                            <span class="checkbox-box"></span> ซ้าย
+                        </label>
                     </div>
                 </div>
                 
@@ -305,13 +566,13 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="font-semibold keep-together py-3">Dominant<br>(ข้างถนัด)</td>
+                            <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                         </tr>
                         <tr>
-                            <td class="font-semibold keep-together py-3">Non-Dominant<br>(ไม่ถนัด)</td>
+                            <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
                             <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
@@ -322,7 +583,7 @@
 
             <!-- Section 4: Back-Leg Dynamometer -->
             <div class="mb-8">
-                <h3 class="font-bold text-lg mb-2 keep-together">4. Back-Leg Dynamometer Test</h3>
+                <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
                 <table>
                     <colgroup>
                         <col style="width: 33.33%;">
@@ -338,57 +599,14 @@
                     </thead>
                     <tbody>
                         <tr class="h-14">
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg"></td>
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <!-- Section 5: Cardio & CR10 -->
-            <div class="mb-6">
-                <h3 class="font-bold text-lg mb-2 keep-together">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
-                <div class="grid grid-cols-2 gap-8">
-                    
-                    <!-- 20M-SRT -->
-                    <div class="border border-black p-0">
-                        <div class="bg-gray-200 p-2 text-center font-bold border-b border-black">
-                            20M-SRT Test
-                        </div>
-                        <div class="p-6 text-center">
-                            <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
-                            <div class="flex justify-center items-end gap-2">
-                                <input type="text" class="input-line text-center text-2xl w-24 font-bold">
-                                <span class="mb-1 text-lg">รอบ</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CR10 Scale -->
-                    <div class="border border-black p-0">
-                        <div class="bg-gray-200 p-2 text-center font-bold border-b border-black">
-                            CR10 Scale (ระดับความเหนื่อย)
-                        </div>
-                        <div class="p-6 grid grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <label class="block text-xs font-semibold mb-1 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
-                                <div class="flex justify-center items-center gap-1">
-                                    <input type="text" class="border border-gray-400 w-14 h-10 text-center rounded text-black">
-                                    <span class="text-black ml-1">/10</span>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <label class="block text-xs font-semibold mb-1 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
-                                <div class="flex justify-center items-center gap-1">
-                                    <input type="text" class="border border-gray-400 w-14 h-10 text-center rounded text-black">
-                                    <span class="text-black ml-1">/10</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
 
     </div>
