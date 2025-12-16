@@ -234,6 +234,35 @@
             }
         }
 
+        // NEW: Function to handle Date Checkbox Sync
+        function syncDateCheckboxes(sourceCheckbox) {
+            const isChecked = sourceCheckbox.checked;
+            const allSyncCheckboxes = document.querySelectorAll('.sync-date-checkbox');
+            
+            // 1. Update all checkboxes to match
+            allSyncCheckboxes.forEach(cb => {
+                cb.checked = isChecked;
+            });
+
+            // 2. If checked, sync date value from this page to all others
+            if (isChecked) {
+                const sourcePage = sourceCheckbox.closest('.a4-page');
+                const sourceDateInput = sourcePage.querySelector('.testDateHidden');
+                const dateValue = sourceDateInput.value;
+                
+                if (dateValue) {
+                    const allHiddenInputs = document.querySelectorAll('.testDateHidden');
+                    allHiddenInputs.forEach(input => {
+                        input.value = dateValue;
+                        // Force update display
+                        const container = input.closest('.date-control');
+                        const display = container.querySelector('.testDateDisplay');
+                        if (display) display.value = formatDateToThai(dateValue);
+                    });
+                }
+            }
+        }
+
         // Function to handle date change for ANY date picker (uses element reference)
         function handleDateChange(hiddenInput) {
             const isoDateString = hiddenInput.value;
@@ -242,6 +271,23 @@
             
             if (displayInput) {
                 displayInput.value = formatDateToThai(isoDateString);
+            }
+
+            // Sync Logic
+            const page = hiddenInput.closest('.a4-page');
+            if (!page) return;
+            const syncCheckbox = page.querySelector('.sync-date-checkbox');
+            
+            if (syncCheckbox && syncCheckbox.checked) {
+                const allHiddenInputs = document.querySelectorAll('.testDateHidden');
+                allHiddenInputs.forEach(input => {
+                    if (input !== hiddenInput) {
+                        input.value = isoDateString;
+                        const container = input.closest('.date-control');
+                        const display = container.querySelector('.testDateDisplay');
+                        if (display) display.value = formatDateToThai(isoDateString);
+                    }
+                });
             }
         }
 
@@ -266,9 +312,12 @@
                  }
             });
 
-            // Clear checkboxes/radios (uncheck all)
-            pageElement.querySelectorAll('.checkbox-box').forEach(box => {
-                box.classList.remove('checked');
+            // Clear checkboxes/radios (uncheck all) (EXCEPT SYNC DATE CHECKBOX)
+            pageElement.querySelectorAll('input[type="checkbox"]').forEach(box => {
+                if (!box.classList.contains('sync-date-checkbox')) {
+                    box.checked = false; // standard checkbox
+                    box.closest('.checkbox-option')?.querySelector('.checkbox-box')?.classList.remove('checked'); // custom style
+                }
             });
         }
         
@@ -332,6 +381,11 @@
 
             if (targetCount === currentCount) return;
 
+            // Check if Sync Date is active
+            const firstPageSyncCheckbox = existingPages[0].querySelector('.sync-date-checkbox');
+            const isSyncDate = firstPageSyncCheckbox ? firstPageSyncCheckbox.checked : false;
+            const firstPageDateValue = existingPages[0].querySelector('.testDateHidden').value;
+
             // Remove excess pages
             if (targetCount < currentCount) {
                 for (let i = currentCount; i > targetCount; i--) {
@@ -350,6 +404,17 @@
                     // Clear inputs and set date to today for the new page
                     clearPageInputs(newPage);
                     initializeDateControl(newPage.querySelector('.date-control'));
+
+                    // Apply sync settings to new page
+                    const newSyncCheckbox = newPage.querySelector('.sync-date-checkbox');
+                    if (newSyncCheckbox) newSyncCheckbox.checked = isSyncDate;
+                    
+                    if (isSyncDate && firstPageDateValue) {
+                        const newDateInput = newPage.querySelector('.testDateHidden');
+                        const newDateDisplay = newPage.querySelector('.testDateDisplay');
+                        newDateInput.value = firstPageDateValue;
+                        newDateDisplay.value = formatDateToThai(firstPageDateValue);
+                    }
 
                     // Insert the new page after the last one
                     let lastPage = document.querySelectorAll('.a4-page');
@@ -619,6 +684,12 @@
 
             <!-- Test Date Selector (Updated to use Classes for cloning support) -->
             <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
+                <!-- Sync Date Checkbox -->
+                <label class="flex items-center mr-4 cursor-pointer select-none no-print">
+                    <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
+                    <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
+                </label>
+
                 <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
                 <!-- Custom Date Input with Icon -->
                 <div class="relative w-40 flex items-center">
