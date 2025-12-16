@@ -63,7 +63,7 @@
             font-size: 16px;
             text-align: left;
             appearance: none;
-            cursor: default; /* Use default cursor on visible display */
+            /* FIX: Remove cursor: default to ensure transparent overlay controls cursor */
         }
         .input-date:focus {
              border-bottom: 2px solid #2563eb;
@@ -151,12 +151,12 @@
         @media print {
             @page {
                 size: A4 portrait;
-                margin: 0; /* ตัดขอบขาวของ browser ออก เพื่อให้ padding ของ .a4-page ทำงานตรงตามหน้าจอ */
+                margin: 0; 
             }
             body {
                 background: white;
                 margin: 0;
-                /* ใช้ขนาดฟอนต์เดียวกับหน้าจอ ไม่ย่อ */
+                font-size: 16px; /* บังคับให้ใช้ขนาดฟอนต์เดียวกับหน้าจอ */
             }
             * {
                 /* บังคับพิมพ์สีพื้นหลังและเส้นขอบ */
@@ -181,9 +181,29 @@
                 display: none !important;
             }
             
+            /* ป้องกันการตัดแยกส่วนหลักข้ามหน้า */
+            .mb-8, .mb-6 {
+                page-break-inside: avoid;
+            }
+
             /* ตรวจสอบเส้นขอบให้เหมือนหน้าจอ */
             .input-line, .input-date, select {
                 border-bottom: 1px solid #9ca3af !important;
+                background-color: transparent !important;
+                color: #000 !important;
+            }
+            
+            /* Ensure table data inputs (which are mostly text) remain centered and transparent */
+            table input[type="text"], table input[type="number"] {
+                background: transparent !important;
+                text-align: center !important;
+                padding: 0 !important; /* Ensure input fits tightly */
+            }
+
+            /* ปรับขนาดกล่อง Input ในส่วน CR10/20M (ถ้าจำเป็น) */
+            .border.border-gray-400 {
+                height: 2.5rem !important; /* ใช้ความสูงมาตรฐาน หรือปรับให้เหมาะสม */
+                font-size: 1rem !important;
             }
         }
 
