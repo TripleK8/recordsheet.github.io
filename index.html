@@ -101,6 +101,7 @@
             text-align: center !important;
         }
         
+        /* Custom Radio/Checkbox Styling */
         .checkbox-group {
             display: inline-flex;
             gap: 10px;
@@ -173,7 +174,7 @@
             .no-print {
                 display: none !important;
             }
-            .delete-page-btn {
+            .delete-page-btn, #custom-modal-overlay {
                 display: none !important;
             }
             
@@ -256,7 +257,64 @@
             }
         }
 
-        // Function to handle Date Checkbox Sync
+        // --- Custom Alert/Confirm Functions (Replaces native alert/confirm) ---
+        let customModalResolve = null;
+
+        function showCustomAlert(message) {
+            const modal = document.getElementById('custom-modal');
+            const messageEl = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const overlay = document.getElementById('custom-modal-overlay');
+
+            messageEl.innerHTML = message.replace(/\n/g, '<br>');
+            confirmBtn.textContent = 'ตกลง';
+            cancelBtn.classList.add('hidden'); // Hide cancel button for alerts
+
+            return new Promise(resolve => {
+                customModalResolve = resolve;
+                confirmBtn.onclick = () => {
+                    hideCustomModal();
+                    resolve(true);
+                };
+                modal.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+            });
+        }
+
+        function showCustomConfirm(message, callback) {
+            const modal = document.getElementById('custom-modal');
+            const messageEl = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('modal-confirm-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const overlay = document.getElementById('custom-modal-overlay');
+
+            messageEl.innerHTML = message.replace(/\n/g, '<br>');
+            confirmBtn.textContent = 'ยืนยัน';
+            cancelBtn.classList.remove('hidden'); // Show cancel button for confirms
+            cancelBtn.textContent = 'ยกเลิก';
+
+            confirmBtn.onclick = () => {
+                hideCustomModal();
+                callback(true);
+            };
+            cancelBtn.onclick = () => {
+                hideCustomModal();
+                callback(false);
+            };
+
+            modal.classList.remove('hidden');
+            overlay.classList.remove('hidden');
+        }
+
+        function hideCustomModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal-overlay').classList.add('hidden');
+        }
+        // --- End Custom Alert/Confirm Functions ---
+
+
+        // Function to handle Radio Checkbox Sync
         function syncDateCheckboxes(sourceCheckbox) {
             const isChecked = sourceCheckbox.checked;
             const allSyncCheckboxes = document.querySelectorAll('.sync-date-checkbox');
@@ -335,10 +393,12 @@
             });
 
             // Clear checkboxes/radios (uncheck all) (EXCEPT SYNC DATE CHECKBOX)
-            pageElement.querySelectorAll('input[type="checkbox"]').forEach(box => {
+            pageElement.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(box => {
                 if (!box.classList.contains('sync-date-checkbox')) {
                     box.checked = false; // standard checkbox
-                    box.closest('.checkbox-option')?.querySelector('.checkbox-box')?.classList.remove('checked'); // custom style
+                    // Find and remove checked class from custom box
+                    const customBox = box.closest('.checkbox-option')?.querySelector('.checkbox-box');
+                    if(customBox) customBox.classList.remove('checked'); 
                 }
             });
         }
@@ -376,7 +436,8 @@
                 // 2. Update รหัสวิจัย (Research ID)
                 const researchIdInput = page.querySelector('.research-id-input');
                 if (researchIdInput) {
-                    researchIdInput.value = `ช${formattedNumber}`;
+                    // Assuming the research ID prefix is 'ช'
+                    researchIdInput.value = `ช${formattedNumber}`; 
                 }
             });
         }
@@ -393,7 +454,8 @@
             });
 
             // Ensure input reflects actual count
-            document.getElementById('pageCountInput').value = allPages.length;
+            const pageCountInput = document.getElementById('pageCountInput');
+            if(pageCountInput) pageCountInput.value = allPages.length;
         }
 
         // Function to set the total number of pages
@@ -402,11 +464,14 @@
             const currentCount = existingPages.length;
 
             if (targetCount === currentCount) return;
+            if (targetCount < 1) targetCount = 1;
 
-            // Check if Sync Date is active
-            const firstPageSyncCheckbox = existingPages[0].querySelector('.sync-date-checkbox');
+            // Get sync status and initial date from the first page before potentially removing it
+            const firstPage = existingPages[0];
+            const firstPageSyncCheckbox = firstPage ? firstPage.querySelector('.sync-date-checkbox') : null;
             const isSyncDate = firstPageSyncCheckbox ? firstPageSyncCheckbox.checked : false;
-            const firstPageDateValue = existingPages[0].querySelector('.testDateHidden').value;
+            const firstPageDateValue = firstPage ? firstPage.querySelector('.testDateHidden').value : '';
+
 
             // Remove excess pages
             if (targetCount < currentCount) {
@@ -416,27 +481,47 @@
             } 
             // Add missing pages
             else if (targetCount > currentCount) {
-                // Use the first page as a template for cloning
+                // Find the existing pages again, as some might have been removed or we need the template
+                existingPages = document.querySelectorAll('.a4-page');
                 const pageTemplate = existingPages[0]; 
                 
                 for (let i = currentCount; i < targetCount; i++) {
                     // Deep clone the template page
                     const newPage = pageTemplate.cloneNode(true);
                     
-                    // Clear inputs and set date to today for the new page
+                    // Clear inputs for the new page
                     clearPageInputs(newPage);
-                    initializeDateControl(newPage.querySelector('.date-control'));
+                    
+                    // Initialize or sync date on the new page
+                    const newDateControl = newPage.querySelector('.date-control');
+                    if (newDateControl) {
+                        initializeDateControl(newDateControl); // Initialize to today first
+                    }
 
                     // Apply sync settings to new page
                     const newSyncCheckbox = newPage.querySelector('.sync-date-checkbox');
                     if (newSyncCheckbox) newSyncCheckbox.checked = isSyncDate;
                     
+                    // If sync is active, overwrite with the first page's date
                     if (isSyncDate && firstPageDateValue) {
                         const newDateInput = newPage.querySelector('.testDateHidden');
                         const newDateDisplay = newPage.querySelector('.testDateDisplay');
-                        newDateInput.value = firstPageDateValue;
-                        newDateDisplay.value = formatDateToThai(firstPageDateValue);
+                        if(newDateInput) newDateInput.value = firstPageDateValue;
+                        if(newDateDisplay) newDateDisplay.value = formatDateToThai(firstPageDateValue);
                     }
+
+                    // Re-run radio logic on clone to ensure visuals match state
+                    newPage.querySelectorAll('.checkbox-option').forEach(label => {
+                        const radio = label.querySelector('input[type="radio"]');
+                        const box = label.querySelector('.checkbox-box');
+                        if (radio && box) {
+                            if (radio.checked) {
+                                box.classList.add('checked');
+                            } else {
+                                box.classList.remove('checked');
+                            }
+                        }
+                    });
 
                     // Insert the new page after the last one
                     let lastPage = document.querySelectorAll('.a4-page');
@@ -466,43 +551,56 @@
             const allPages = document.querySelectorAll('.a4-page');
             
             if (allPages.length > 1) {
-                // Custom confirmation message
                 const pageNum = Array.from(allPages).indexOf(buttonElement.closest('.a4-page')) + 1;
-                if (confirm(`ยืนยันการลบหน้า ${pageNum} หรือไม่? ข้อมูลทั้งหมดในหน้าจะถูกลบ`)) {
-                    const page = buttonElement.closest('.a4-page');
-                    page.remove();
-                    updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
-                }
+                
+                showCustomConfirm(`ยืนยันการลบหน้า ${pageNum} หรือไม่? ข้อมูลทั้งหมดในหน้าจะถูกลบ`, (confirmed) => {
+                    if (confirmed) {
+                        const page = buttonElement.closest('.a4-page');
+                        page.remove();
+                        updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
+                    }
+                });
             } else {
-                alert('ไม่สามารถลบหน้าสุดท้ายได้');
+                showCustomAlert('ไม่สามารถลบหน้าสุดท้ายได้');
             }
         }
         
-        // Function to handle checkbox interaction (for visual feedback)
-        function toggleCheckbox(element) {
-            const group = element.closest('.checkbox-option');
-            const parentGroup = group.closest('.checkbox-control');
-            const box = group.querySelector('.checkbox-box');
-            
-            parentGroup.querySelectorAll('.checkbox-box').forEach(otherBox => {
-                otherBox.classList.remove('checked');
-            });
+        // Function to handle custom radio selection
+        function toggleRadio(labelElement) {
+            const group = labelElement.closest('.checkbox-option');
+            const inputRadio = group.querySelector('input[type="radio"]');
+            const parentControl = labelElement.closest('.checkbox-control');
 
-            box.classList.add('checked');
+            if (!inputRadio) return;
+
+            // 1. Set the clicked radio button to checked
+            inputRadio.checked = true;
+
+            // 2. Update visual state for all radios in the group
+            parentControl.querySelectorAll('input[type="radio"]').forEach(radio => {
+                const box = radio.closest('.checkbox-option').querySelector('.checkbox-box');
+                if (radio.checked) {
+                    box.classList.add('checked');
+                } else {
+                    box.classList.remove('checked');
+                }
+            });
         }
 
         // Function to clear only imported fields (now clears all fields with data-field attribute)
         function clearImportedData() {
             const allPages = document.querySelectorAll('.a4-page');
             
-            if (confirm('ยืนยันการล้างข้อมูลที่นำเข้า (ชื่อเล่น, ชื่อจริง, อายุ, สัดส่วน, 20M/CR10) จากทุกหน้าหรือไม่?')) {
-                allPages.forEach(page => {
-                    page.querySelectorAll('[data-field]').forEach(input => {
-                        input.value = '';
+            showCustomConfirm('ยืนยันการล้างข้อมูลที่นำเข้า (ชื่อเล่น, ชื่อจริง, อายุ, สัดส่วน, 20M/CR10) จากทุกหน้าหรือไม่?', (confirmed) => {
+                if (confirmed) {
+                    allPages.forEach(page => {
+                        page.querySelectorAll('[data-field]').forEach(input => {
+                            input.value = '';
+                        });
                     });
-                });
-                alert('ล้างข้อมูลที่นำเข้าทั้งหมดเรียบร้อยแล้ว');
-            }
+                    showCustomAlert('ล้างข้อมูลที่นำเข้าทั้งหมดเรียบร้อยแล้ว');
+                }
+            });
         }
 
         // === Excel Import Functions ===
@@ -510,11 +608,13 @@
         function handleFile(event) {
             const file = event.target.files[0];
             if (!file) return;
+
             if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-                 alert('กรุณาเลือกไฟล์ Excel (.xlsx หรือ .xls) เท่านั้น');
-                 event.target.value = '';
-                 return;
+                showCustomAlert('กรุณาเลือกไฟล์ Excel (.xlsx หรือ .xls) เท่านั้น');
+                event.target.value = '';
+                return;
             }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
@@ -526,7 +626,7 @@
                     processExcelData(dataRows);
                 } catch (error) {
                     console.error("Error processing Excel file:", error);
-                    alert(`เกิดข้อผิดพลาดในการประมวลผลไฟล์ Excel: ${error.message}.`);
+                    showCustomAlert(`เกิดข้อผิดพลาดในการประมวลผลไฟล์ Excel: ${error.message}.`);
                 }
                 event.target.value = '';
             };
@@ -535,11 +635,12 @@
 
         function processExcelData(data) {
             if (data.length === 0) {
-                alert('ไม่พบข้อมูลที่จะนำเข้า กรุณาตรวจสอบเนื้อหาในไฟล์ Excel');
+                showCustomAlert('ไม่พบข้อมูลที่จะนำเข้า กรุณาตรวจสอบเนื้อหาในไฟล์ Excel');
                 return;
             }
+
             const requiredPages = data.length;
-            setTotalPages(requiredPages);
+            setTotalPages(requiredPages); // Ensure enough pages exist
             const allPages = document.querySelectorAll('.a4-page');
             const importedCount = data.length;
             
@@ -557,14 +658,21 @@
                 const getInput = (field) => page.querySelector(`[data-field="${field}"]`);
 
                 // 1. Calculate Average Height from Index 3 and 4
-                const height1 = getNumberValue(3); const height2 = getNumberValue(4);
+                const height1 = getNumberValue(3); 
+                const height2 = getNumberValue(4);
                 let calculatedHeight = '';
-                if (!isNaN(height1) && !isNaN(height2)) { calculatedHeight = ((height1 + height2) / 2).toFixed(1); 
-                } else if (!isNaN(height1)) { calculatedHeight = height1.toFixed(1);
-                } else if (!isNaN(height2)) { calculatedHeight = height2.toFixed(1); }
+                if (!isNaN(height1) && !isNaN(height2)) { 
+                    calculatedHeight = ((height1 + height2) / 2).toFixed(1); 
+                } else if (!isNaN(height1)) { 
+                    calculatedHeight = height1.toFixed(1);
+                } else if (!isNaN(height2)) { 
+                    calculatedHeight = height2.toFixed(1); 
+                }
                 
                 // 2. General Info Mapping
-                const fullname = getValue(0); const nickname = getValue(1); const age = getValue(2);
+                const fullname = getValue(0); 
+                const nickname = getValue(1); 
+                const age = getValue(2);
                 if (getInput('fullname')) { getInput('fullname').value = fullname; }
                 if (getInput('nickname')) { getInput('nickname').value = nickname; }
                 if (getInput('age')) { getInput('age').value = age.replace(/[^0-9.]/g, ''); }
@@ -582,23 +690,51 @@
                 if (getInput('cr10-muscle')) { getInput('cr10-muscle').value = getValue(11); }
             });
 
-            alert(`นำเข้าข้อมูลสำเร็จ: พบ ${importedCount} รายการ และได้เติมข้อมูลทั้งหมดลงในเอกสาร ${importedCount} หน้าเรียบร้อยแล้ว`);
+            showCustomAlert(`นำเข้าข้อมูลสำเร็จ: พบ ${importedCount} รายการ และได้เติมข้อมูลทั้งหมดลงในเอกสาร ${importedCount} หน้าเรียบร้อยแล้ว`);
         }
         
         // === END Excel Import Functions ===
 
         // Initialize event listeners and page count on load
         window.onload = () => {
+            // Initialize pages and numbering
             setTotalPages(1); 
-             document.querySelectorAll('.checkbox-option').forEach(el => {
+            
+            // Set up radio click listener for custom appearance
+            document.querySelectorAll('.checkbox-option').forEach(el => {
                 el.addEventListener('click', (e) => {
-                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SPAN') { toggleCheckbox(el); }
+                    // Only trigger if clicking the label/container, not the hidden input itself
+                    if (e.target.tagName !== 'INPUT') { 
+                        toggleRadio(el); 
+                    }
                 });
+            });
+
+            // Set default checked state for the first radio options on the first page load (e.g., Male/Right)
+            document.querySelectorAll('.a4-page:first-child .checkbox-control').forEach(control => {
+                const firstRadio = control.querySelector('input[type="radio"]:first-of-type');
+                if (firstRadio) {
+                    toggleRadio(firstRadio.closest('.checkbox-option'));
+                }
             });
         };
     </script>
 </head>
 <body>
+
+    <!-- Custom Modal/Alert Overlay and Structure -->
+    <div id="custom-modal-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-70 z-[100] hidden"></div>
+    <div id="custom-modal" class="fixed inset-0 flex items-center justify-center z-[101] hidden">
+        <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm mx-4" role="dialog" aria-modal="true">
+            <div class="text-lg font-semibold mb-4 text-gray-900">การแจ้งเตือน</div>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-end gap-3">
+                <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition hidden">ยกเลิก</button>
+                <button id="modal-confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition">ตกลง</button>
+            </div>
+        </div>
+    </div>
+    <!-- End Custom Modal -->
 
     <!-- Floating Buttons Container -->
     <div class="fixed top-4 right-4 no-print z-50 flex flex-col items-end gap-3">
@@ -637,292 +773,301 @@
     </div>
 
     <!-- A4 Paper Container -->
-    <div class="a4-page flex flex-col">
-        
-        <!-- Delete Page Button (Absolute position, Top-Left) -->
-        <button onclick="deletePage(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-md shadow-lg transition delete-page-btn no-print" title="ลบหน้านี้">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            ลบหน้า
-        </button>
-
-        <!-- Document Content -->
-        <div>
-            <!-- Header -->
-            <div class="text-center mb-6">
-                <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
-                <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
-            </div>
-
-            <!-- Training Center Name (Dropdown) -->
-            <div class="mb-4 flex items-end justify-center px-4 header-info">
-                <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
-                <select 
-                    class="input-line flex-1 text-center font-bold text-lg cursor-pointer trainingCenterSelect" 
-                    onchange="syncCenterSelection(this.value)"
-                >
-                    <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
-                    <option value="ระยอง">ระยอง</option>
-                    <option value="ราชบุรี">ราชบุรี</option>
-                    <option value="บ้านชายกรุณา">บ้านชายกรุณา</option>
-                    <option value="เชียงใหม่">เชียงใหม่</option>
-                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-                    <option value="อุบลราชธานี">อุบลราชธานี</option>
-                </select>
-            </div>
-
-            <!-- Test Date Selector (Updated to use Classes for cloning support) -->
-            <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
-                <!-- Sync Date Checkbox -->
-                <label class="flex items-center mr-4 cursor-pointer select-none no-print">
-                    <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
-                    <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
-                </label>
-
-                <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
-                <!-- Custom Date Input with Icon -->
-                <div class="relative w-40 flex items-center">
-                    <!-- Visible Input for Thai Format (pr-8 for icon space) -->
-                    <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี">
-                    
-                    <!-- Calendar Icon (Visual only) -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    
-                    <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
-                    <input 
-                        type="date" 
-                        class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
-                        onchange="handleDateChange(this)" 
-                        style="height: 100%; border: none; z-index: 10;"
-                    >
-                </div>
-            </div>
-
-            <!-- Section 1: General Info -->
-            <div class="mb-8 border border-black p-5 rounded-md">
-                <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information)</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
-                        <!-- Input for automatic numbering -->
-                        <input type="text" class="input-line sequence-number-input" readonly>
-                    </div>
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
-                        <!-- Input for automatic numbering -->
-                        <input type="text" class="input-line research-id-input" readonly>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
-                        <!-- MAPPED: Column 0 -->
-                        <input type="text" class="input-line" data-field="fullname">
-                    </div>
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
-                        <!-- MAPPED: Column 1 -->
-                        <input type="text" class="input-line" data-field="nickname">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
-                        <div class="flex w-full items-end">
-                            <!-- MAPPED: Column 2 -->
-                            <input type="number" class="input-line" data-field="age">
-                            <span class="ml-2 text-gray-700">ปี</span>
-                        </div>
-                    </div>
-                    <div></div> <!-- Placeholder to keep layout even -->
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
-                    <div class="flex items-center checkbox-control">
-                        <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
-                        <label class="checkbox-group mr-4 checkbox-option">
-                            <span class="checkbox-box"></span> ชาย
-                        </label>
-                        <label class="checkbox-group checkbox-option">
-                            <span class="checkbox-box"></span> หญิง
-                        </label>
-                    </div>
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
-                        <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
-                        <input type="number" class="input-line" data-field="height">
-                        <span class="ml-2 text-gray-700">ซม.</span>
-                    </div>
-                    <div class="flex items-end">
-                        <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
-                        <input type="number" class="input-line">
-                        <span class="ml-2 text-gray-700">กก.</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 2: Body Composition -->
-            <div class="mb-8">
-                <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
-                <table class="label-table">
-                    <colgroup>
-                        <col style="width: 40%;">
-                        <col style="width: 30%;">
-                        <col style="width: 30%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th class="keep-together">รายการ (Item)</th>
-                            <th>Trial 1 (cm)</th>
-                            <th>Trial 2 (cm)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
-                            <!-- MAPPED: Column 5 and 6 -->
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist1"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist2"></td>
-                        </tr>
-                        <tr>
-                            <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
-                            <!-- MAPPED: Column 7 and 8 -->
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip1"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip2"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Section 3: Handgrip Strength -->
-            <div class="mb-8">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
-                    <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
-                    <div class="flex items-center checkbox-control">
-                        <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
-                        <label class="checkbox-group mr-4 checkbox-option">
-                            <span class="checkbox-box"></span> ขวา
-                        </label>
-                        <label class="checkbox-group checkbox-option">
-                            <span class="checkbox-box"></span> ซ้าย
-                        </label>
-                    </div>
-                </div>
-                
-                <table class="label-table">
-                    <colgroup>
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th class="keep-together py-2">ข้าง (Side)</th>
-                            <th class="py-2">Trial 1 (kg)</th>
-                            <th class="py-2">Trial 2 (kg)</th>
-                            <th class="py-2">Trial 3 (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                        </tr>
-                        <tr>
-                            <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Section 4: Back-Leg Dynamometer -->
-            <div class="mb-8">
-                <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
-                <table>
-                    <colgroup>
-                        <col style="width: 33.33%;">
-                        <col style="width: 33.33%;">
-                        <col style="width: 33.33%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th class="py-2">Trial 1 (kg)</th>
-                            <th class="py-2">Trial 2 (kg)</th>
-                            <th class="py-2">Trial 3 (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="h-14">
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                            <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
-            <div class="mb-6">
-                <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
-                    <!-- 20M-SRT (Updated to boxed style) -->
-                    <div class="border border-black rounded-md overflow-hidden shadow-lg">
-                        <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
-                            20M-SRT Test (20m Shuttle Run Test)
-                        </div>
-                        <div class="p-6 text-center bg-gray-50">
-                            <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
-                            <div class="flex justify-center items-end gap-2">
-                                <!-- MAPPED: Column 9 -->
-                                <input 
-                                    type="number" 
-                                    min="0" 
-                                    class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-xl font-bold"
-                                    data-field="20m-laps"
-                                >
-                                <span class="mb-1 text-2xl text-gray-700">รอบ</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CR10 Scale -->
-                    <div class="border border-black rounded-md overflow-hidden shadow-lg">
-                        <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
-                            CR10 Scale (ระดับความเหนื่อย)
-                        </div>
-                        <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
-                            <div class="text-center">
-                                <label class="block text-sm font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
-                                <div class="flex justify-center items-center gap-1">
-                                    <!-- MAPPED: Column 10 -->
-                                    <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-cardio">
-                                    <span class="text-black ml-1 text-lg">/10</span>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <label class="block text-sm font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
-                                <div class="flex justify-center items-center gap-1">
-                                    <!-- MAPPED: Column 11 -->
-                                    <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-muscle">
-                                    <span class="text-black ml-1 text-lg">/10</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="page-container">
+        <!-- Initial Page Template -->
+        <div class="a4-page flex flex-col">
             
-        </div>
+            <!-- Delete Page Button (Absolute position, Top-Left) -->
+            <button onclick="deletePage(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-md shadow-lg transition delete-page-btn no-print" title="ลบหน้านี้">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                ลบหน้า
+            </button>
 
+            <!-- Document Content -->
+            <div>
+                <!-- Header -->
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
+                    <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
+                </div>
+
+                <!-- Training Center Name (Dropdown) -->
+                <div class="mb-4 flex items-end justify-center px-4 header-info">
+                    <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
+                    <select 
+                        class="input-line flex-1 text-center font-bold text-lg cursor-pointer trainingCenterSelect" 
+                        onchange="syncCenterSelection(this.value)"
+                    >
+                        <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
+                        <option value="ระยอง">ระยอง</option>
+                        <option value="ราชบุรี">ราชบุรี</option>
+                        <option value="บ้านชายกรุณา">บ้านชายกรุณา</option>
+                        <option value="เชียงใหม่">เชียงใหม่</option>
+                        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                        <option value="อุบลราชธานี">อุบลราชธานี</option>
+                    </select>
+                </div>
+
+                <!-- Test Date Selector (Updated to use Classes for cloning support) -->
+                <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
+                    <!-- Sync Date Checkbox -->
+                    <label class="flex items-center mr-4 cursor-pointer select-none no-print">
+                        <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
+                        <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
+                    </label>
+
+                    <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
+                    <!-- Custom Date Input with Icon -->
+                    <div class="relative w-40 flex items-center">
+                        <!-- Visible Input for Thai Format (pr-8 for icon space) -->
+                        <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
+                        
+                        <!-- Calendar Icon (Visual only) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        
+                        <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
+                        <input 
+                            type="date" 
+                            class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
+                            onchange="handleDateChange(this)" 
+                            style="height: 100%; border: none; z-index: 10;"
+                        >
+                    </div>
+                </div>
+
+                <!-- Section 1: General Info -->
+                <div class="mb-8 border border-black p-5 rounded-md">
+                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information)</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
+                            <!-- Input for automatic numbering -->
+                            <input type="text" class="input-line sequence-number-input" readonly>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
+                            <!-- Input for automatic numbering -->
+                            <input type="text" class="input-line research-id-input" readonly>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
+                            <!-- MAPPED: Column 0 -->
+                            <input type="text" class="input-line" data-field="fullname">
+                        </div>
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
+                            <!-- MAPPED: Column 1 -->
+                            <input type="text" class="input-line" data-field="nickname">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
+                            <div class="flex w-full items-end">
+                                <!-- MAPPED: Column 2 -->
+                                <input type="number" class="input-line" data-field="age">
+                                <span class="ml-2 text-gray-700">ปี</span>
+                            </div>
+                        </div>
+                        <div></div> <!-- Placeholder to keep layout even -->
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
+                        <div class="flex items-center checkbox-control">
+                            <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
+                            <!-- REFACTORED to use hidden RADIO input -->
+                            <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                <input type="radio" name="gender" value="male" class="hidden">
+                                <span class="checkbox-box"></span> ชาย
+                            </label>
+                            <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                <input type="radio" name="gender" value="female" class="hidden">
+                                <span class="checkbox-box"></span> หญิง
+                            </label>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
+                            <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
+                            <input type="number" class="input-line" data-field="height">
+                            <span class="ml-2 text-gray-700">ซม.</span>
+                        </div>
+                        <div class="flex items-end">
+                            <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
+                            <input type="number" class="input-line">
+                            <span class="ml-2 text-gray-700">กก.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Body Composition -->
+                <div class="mb-8">
+                    <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                    <table class="label-table">
+                        <colgroup>
+                            <col style="width: 40%;">
+                            <col style="width: 30%;">
+                            <col style="width: 30%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="keep-together">รายการ (Item)</th>
+                                <th>Trial 1 (cm)</th>
+                                <th>Trial 2 (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
+                                <!-- MAPPED: Column 5 and 6 -->
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist1"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist2"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
+                                <!-- MAPPED: Column 7 and 8 -->
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip1"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 3: Handgrip Strength -->
+                <div class="mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
+                        <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
+                        <div class="flex items-center checkbox-control">
+                            <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
+                            <!-- REFACTORED to use hidden RADIO input -->
+                            <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                <input type="radio" name="dominantHand" value="right" class="hidden">
+                                <span class="checkbox-box"></span> ขวา
+                            </label>
+                            <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                <input type="radio" name="dominantHand" value="left" class="hidden">
+                                <span class="checkbox-box"></span> ซ้าย
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <table class="label-table">
+                        <colgroup>
+                            <col style="width: 25%;">
+                            <col style="width: 25%;">
+                            <col style="width: 25%;">
+                            <col style="width: 25%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="keep-together py-2">ข้าง (Side)</th>
+                                <th class="py-2">Trial 1 (kg)</th>
+                                <th class="py-2">Trial 2 (kg)</th>
+                                <th class="py-2">Trial 3 (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 4: Back-Leg Dynamometer -->
+                <div class="mb-8">
+                    <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
+                    <table>
+                        <colgroup>
+                            <col style="width: 33.33%;">
+                            <col style="width: 33.33%;">
+                            <col style="width: 33.33%;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="py-2">Trial 1 (kg)</th>
+                                <th class="py-2">Trial 2 (kg)</th>
+                                <th class="py-2">Trial 3 (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="h-14">
+                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
+                <div class="mb-6">
+                    <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <!-- 20M-SRT (Updated to boxed style) -->
+                        <div class="border border-black rounded-md overflow-hidden shadow-lg">
+                            <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                20M-SRT Test (20m Shuttle Run Test)
+                            </div>
+                            <div class="p-6 text-center bg-gray-50">
+                                <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
+                                <div class="flex justify-center items-end gap-2">
+                                    <!-- MAPPED: Column 9 -->
+                                    <input 
+                                        type="number" 
+                                        min="0" 
+                                        class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-xl font-bold"
+                                        data-field="20m-laps"
+                                    >
+                                    <span class="mb-1 text-2xl text-gray-700">รอบ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CR10 Scale -->
+                        <div class="border border-black rounded-md overflow-hidden shadow-lg">
+                            <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                CR10 Scale (ระดับความเหนื่อย)
+                            </div>
+                            <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
+                                <div class="text-center">
+                                    <label class="block text-sm font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
+                                    <div class="flex justify-center items-center gap-1">
+                                        <!-- MAPPED: Column 10 -->
+                                        <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-cardio">
+                                        <span class="text-black ml-1 text-lg">/10</span>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <label class="block text-sm font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
+                                    <div class="flex justify-center items-center gap-1">
+                                        <!-- MAPPED: Column 11 -->
+                                        <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-muscle">
+                                        <span class="text-black ml-1 text-lg">/10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
     </div>
 
 </body>
