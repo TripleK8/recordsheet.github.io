@@ -180,7 +180,6 @@
                 margin: 0;
                 page-break-after: always;
                 width: 210mm !important; 
-                /* CRITICAL FIX: ใช้ height: auto และ min-height: 297mm */
                 min-height: 297mm !important; 
                 height: auto !important; 
                 overflow: hidden !important; 
@@ -189,6 +188,18 @@
                 padding: 20mm 15mm !important; 
                 border-radius: 0;
             }
+
+            /* *** การแก้ไขปัญหา Margin/Overflow CRITICAL FIX *** */
+            /* 1. บังคับให้ Wrapper ภายในไม่เพิ่ม Margin */
+            .a4-page > div {
+                margin: 0 !important;
+                padding: 0 !important;
+                /* 2. เทคนิค Micro-Scaling เพื่อแก้ไขปัญหาการปัดเศษของเบราว์เซอร์ */
+                transform: scaleY(0.995); 
+                transform-origin: top;
+            }
+            /* ************************************************* */
+
             .no-print {
                 display: none !important;
             }
@@ -207,11 +218,11 @@
             /* --- 2. การลดระยะห่าง (Margin/Padding) เพื่อบีบอัดเนื้อหาในโหมดพิมพ์ (COMPRESSED) --- */
             /* ลด Margin หลักของ Section */
             .mb-8 { 
-                margin-bottom: 0.75rem !important; /* COMPRESSED: ลดเป็น 12px */
+                margin-bottom: 0.6rem !important; /* AGGRESSIVE COMPRESSION (9.6px) */
                 page-break-inside: avoid !important; /* Ensure it stays together */
             }
             .mb-6 { 
-                margin-bottom: 0.5rem !important; /* COMPRESSED: ลดเป็น 8px */
+                margin-bottom: 0.4rem !important; /* AGGRESSIVE COMPRESSION (6.4px) */
                 page-break-inside: avoid !important; 
             }
             /* ลด Margin ย่อย */
@@ -243,7 +254,6 @@
             
             /* --- 3. การป้องกันการตัดแยกส่วนหลัก (Page Break Inside) --- */
             /* ใช้ page-break-inside: avoid!important บนองค์ประกอบที่สำคัญทั้งหมด */
-            /* ส่วนของ Section ที่เป็น div ย่อย (Section 1, 2, 3, 4, 5) และ Table */
             .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
                 page-break-inside: avoid !important;
             }
@@ -260,7 +270,6 @@
                 color: #000 !important; /* Ensure black text */
                 user-select: none !important;
                 -webkit-user-select: none !important;
-                /* Note: This fixes the content disappearing issue */
             }
             
             /* Re-apply line border for specific inputs */
