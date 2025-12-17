@@ -248,14 +248,29 @@
                 page-break-inside: avoid !important;
             }
 
-            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES (คงเดิม) --- */
-            .input-line, .input-date, select {
-                border-bottom: 1px solid #9ca3af !important;
-                background-color: transparent !important;
-                color: #000 !important;
-                border-bottom-width: 1px !important; 
+            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES --- */
+            
+            /* CRITICAL FIX: Ensure all input values are treated as static text for printing reliability */
+            input, select {
+                box-shadow: none !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                pointer-events: none !important; /* Disable interaction */
+                color: #000 !important; /* Ensure black text */
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                /* Note: This fixes the content disappearing issue */
             }
             
+            /* Re-apply line border for specific inputs */
+            .input-line, .input-date, select {
+                border-bottom: 1px solid #000 !important; /* Force black line */
+                border-bottom-width: 1px !important; 
+                background-color: transparent !important;
+            }
+            
+            /* Reset table input styles */
             table input[type="text"], table input[type="number"] {
                 background: transparent !important;
                 text-align: center !important;
