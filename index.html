@@ -250,6 +250,14 @@
                 height: 2rem !important; /* ลดลงเหลือ 32px */
             }
 
+            /* **NEW** Section 5 Specific Compression to bring it up */
+            .section-5-box .p-6 {
+                padding: 0.5rem !important; /* ลด padding ในกล่องข้อ 5 อย่างหนัก */
+            }
+            .section-5-grid {
+                gap: 1rem !important; /* ลด gap ระหว่างกล่อง */
+            }
+
             /* --- 3. การป้องกันการตัดแยกส่วนหลัก (Page Break Inside) --- */
             .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
                 page-break-inside: avoid !important;
@@ -947,12 +955,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                         <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
-                            <div class="flex w-full items-end">
-                                <!-- MAPPED: Column 2 -->
-                                <input type="number" class="input-line" data-field="age">
-                                <span class="ml-2 text-gray-700">ปี</span>
-                            </div>
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
+                            <!-- MAPPED: Column 0 -->
+                            <input type="text" class="input-line" data-field="fullname">
                         </div>
                         <div class="flex items-end">
                             <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
@@ -963,9 +968,12 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                         <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
-                            <!-- MAPPED: Column 0 -->
-                            <input type="text" class="input-line" data-field="fullname">
+                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
+                            <div class="flex w-full items-end">
+                                <!-- MAPPED: Column 2 -->
+                                <input type="number" class="input-line" data-field="age">
+                                <span class="ml-2 text-gray-700">ปี</span>
+                            </div>
                         </div>
                         <div></div> <!-- Placeholder to keep layout even -->
                     </div>
@@ -1109,10 +1117,10 @@
                 <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
                 <div class="mb-6">
                     <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 section-5-grid">
                         
                         <!-- 20M-SRT (Updated to boxed style) -->
-                        <div class="border border-black rounded-md overflow-hidden shadow-lg">
+                        <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
                             <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
                                 20M-SRT Test (20m Shuttle Run Test)
                             </div>
@@ -1132,7 +1140,7 @@
                         </div>
 
                         <!-- CR10 Scale -->
-                        <div class="border border-black rounded-md overflow-hidden shadow-lg">
+                        <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
                             <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
                                 CR10 Scale (ระดับความเหนื่อย)
                             </div>
