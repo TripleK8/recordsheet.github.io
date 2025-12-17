@@ -184,13 +184,11 @@
                 height: auto !important; 
                 overflow: hidden !important; 
                 
-                /* ปรับ Padding ตามข้อกำหนด (20mm บน/ล่าง, 15mm ซ้าย/ขวา) */
-                padding: 20mm 15mm !important; 
+                /* CRITICAL FIX: ลด Padding ด้านบนเหลือ 10mm เพื่อดึงทุกอย่างขึ้น */
+                padding: 10mm 15mm 10mm 15mm !important; 
                 border-radius: 0;
             }
 
-            /* *** การแก้ไขปัญหา Margin/Overflow CRITICAL FIX (v6 Aggressive Compression) *** */
-            
             /* 1. บังคับให้ Wrapper ภายในไม่เพิ่ม Margin */
             .a4-page > div {
                 margin: 0 !important;
@@ -204,58 +202,62 @@
                 display: none !important;
             }
             
-            /* --- 1. การควบคุมขนาด Font สำหรับพิมพ์ --- */
-            .text-3xl { font-size: 24pt !important; } 
-            .text-xl { font-size: 16pt !important; }
+            /* --- 1. การลดขนาด Font สำหรับพิมพ์ --- */
+            /* ลดขนาดหัวข้อลงอีกเล็กน้อย */
+            .text-3xl { font-size: 20pt !important; margin-bottom: 0 !important; } 
+            .text-xl { font-size: 14pt !important; }
             .text-lg { font-size: 14pt !important; }
             .text-base { font-size: 12pt !important; }
             .text-sm { font-size: 10pt !important; }
             .font-semibold { font-weight: 600 !important; }
 
-            /* --- 2. การลดระยะห่าง (Margin/Padding) เพื่อบีบอัดเนื้อหา (Aggressive Compression) --- */
+            /* --- 2. การลดระยะห่าง (Margin/Padding) แบบ Aggressive --- */
             
-            /* Header and top spacing */
-            .a4-page .text-center.mb-6 { margin-bottom: 0.4rem !important; } 
-            .a4-page .header-info { margin-bottom: 0.2rem !important; } /* ลดลงเหลือ 3.2px */
+            /* Header spacing reduced further */
+            .a4-page .text-center.mb-6 { margin-bottom: 0.2rem !important; } 
+            .a4-page .header-info { margin-bottom: 0.1rem !important; } /* แทบจะติดกัน */
+            .mb-4 { margin-bottom: 0.2rem !important; } /* ลดระยะห่างทั่วไป */
 
-            /* Section 1 box padding (p-5 -> p-2 ใน print) */
-            .a4-page div.border.border-black.p-5 { padding: 0.4rem !important; } /* ลดลงเหลือ 6.4px */
+            /* Section 1 box padding */
+            .a4-page div.border.border-black.p-5 { padding: 0.3rem !important; }
 
-            /* Internal grid margins in Section 1 */
-            .a4-page .grid-cols-2.mb-3 { margin-bottom: 0.15rem !important; } /* ลดลงเหลือ 2.4px */
-            .a4-page .grid-cols-3.mt-4 { margin-top: 0.3rem !important; } /* ลดลง */
+            /* Internal grid margins */
+            .a4-page .grid-cols-2.mb-3 { margin-bottom: 0.1rem !important; }
+            .a4-page .grid-cols-3.mt-4 { margin-top: 0.2rem !important; }
 
-            /* Section 2, 3, 4 margins */
+            /* Section 2, 3, 4 margins - บีบให้แน่น */
             .mb-8 { 
-                margin-bottom: 0.4rem !important; /* AGGRESSIVE COMPRESSION: 6.4px */
+                margin-bottom: 0.3rem !important; 
                 page-break-inside: avoid !important; 
             }
             .mb-6 { 
-                margin-bottom: 0.2rem !important; /* AGGRESSIVE COMPRESSION: 3.2px */
+                margin-bottom: 0.2rem !important; 
                 page-break-inside: avoid !important; 
             }
 
-            /* ลด Padding ใน Table Cells เพื่อประหยัดพื้นที่แนวตั้ง */
+            /* Table padding reduction */
             table th, table td {
-                padding: 3px 3px !important; /* ลดลงเหลือ 3px */
+                padding: 2px 3px !important; 
                 height: auto !important;
             }
-            /* ลดความสูงของแถว Back-Leg Dynamometer */
             .h-14 {
-                height: 2rem !important; /* ลดลงเหลือ 32px */
+                height: 1.8rem !important; /* ลดความสูงแถว */
             }
             
-            /* Table input box height reduction (20M/CR10) */
+            /* Input box height reduction */
             .border.border-gray-400 {
-                height: 2rem !important; /* ลดลงเหลือ 32px */
+                height: 1.8rem !important;
             }
 
-            /* **NEW** Section 5 Specific Compression to bring it up */
+            /* Section 5 Specific Compression */
             .section-5-box .p-6 {
-                padding: 0.5rem !important; /* ลด padding ในกล่องข้อ 5 อย่างหนัก */
+                padding: 0.3rem !important; 
             }
             .section-5-grid {
-                gap: 1rem !important; /* ลด gap ระหว่างกล่อง */
+                gap: 0.5rem !important; /* ลดช่องว่างระหว่างซ้ายขวา */
+            }
+            .section-5-box .bg-gray-200 {
+                padding: 0.2rem !important; /* ลด header ของกล่อง */
             }
 
             /* --- 3. การป้องกันการตัดแยกส่วนหลัก (Page Break Inside) --- */
@@ -263,7 +265,7 @@
                 page-break-inside: avoid !important;
             }
 
-            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES (คงเดิม) --- */
+            /* --- 4. INPUT AND CHECKBOX FIXES --- */
             input, select {
                 box-shadow: none !important;
                 -webkit-appearance: none !important;
