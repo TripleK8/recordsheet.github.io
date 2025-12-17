@@ -189,16 +189,14 @@
                 border-radius: 0;
             }
 
-            /* *** การแก้ไขปัญหา Margin/Overflow CRITICAL FIX *** */
-            /* 1. บังคับให้ Wrapper ภายในไม่เพิ่ม Margin */
+            /* *** การแก้ไขปัญหา Margin/Overflow CRITICAL FIX (v5 Aggressive Compression) *** */
+            
+            /* 1. บังคับให้ Wrapper ภายในไม่เพิ่ม Margin และเอา Micro-Scaling ออก */
             .a4-page > div {
                 margin: 0 !important;
                 padding: 0 !important;
-                /* 2. เทคนิค Micro-Scaling เพื่อแก้ไขปัญหาการปัดเศษของเบราว์เซอร์ */
-                transform: scaleY(0.995); 
-                transform-origin: top;
+                /* NOTE: Removed transform: scaleY(0.995); */
             }
-            /* ************************************************* */
 
             .no-print {
                 display: none !important;
@@ -215,71 +213,67 @@
             .text-sm { font-size: 10pt !important; }
             .font-semibold { font-weight: 600 !important; }
 
-            /* --- 2. การลดระยะห่าง (Margin/Padding) เพื่อบีบอัดเนื้อหาในโหมดพิมพ์ (COMPRESSED) --- */
-            /* ลด Margin หลักของ Section */
+            /* --- 2. การลดระยะห่าง (Margin/Padding) เพื่อบีบอัดเนื้อหา (Aggressive Compression) --- */
+            
+            /* Header and top spacing */
+            .a4-page .text-center.mb-6 { margin-bottom: 0.4rem !important; } /* ลดHeader spacing */
+            .a4-page .header-info { margin-bottom: 0.3rem !important; } /* ลด Date/Center spacing */
+
+            /* Section 1 box padding (p-5 -> p-2 ใน print) */
+            .a4-page div.border.border-black.p-5 { padding: 0.5rem !important; } /* ลดจาก 0.75rem */
+
+            /* Internal grid margins in Section 1 */
+            .a4-page .grid-cols-2.mb-3 { margin-bottom: 0.2rem !important; }
+            .a4-page .grid-cols-3.mt-4 { margin-top: 0.4rem !important; } 
+
+            /* Section 2, 3, 4 margins */
             .mb-8 { 
-                margin-bottom: 0.6rem !important; /* AGGRESSIVE COMPRESSION (9.6px) */
-                page-break-inside: avoid !important; /* Ensure it stays together */
-            }
-            .mb-6 { 
-                margin-bottom: 0.4rem !important; /* AGGRESSIVE COMPRESSION (6.4px) */
+                margin-bottom: 0.5rem !important; /* COMPRESSED: ลดเป็น 8px */
                 page-break-inside: avoid !important; 
             }
-            /* ลด Margin ย่อย */
-            .mb-4 {
-                margin-bottom: 0.5rem !important; 
-            }
-            .mb-3 {
-                margin-bottom: 0.3rem !important; /* COMPRESSED: ลดลงอีก */
-            }
-            /* ลด Padding/Margin ในส่วน Header Info (วันที่/ศูนย์) */
-            .header-info {
-                margin-bottom: 0.5rem !important; /* COMPRESSED: ลดลง */
-            }
-
-            /* ลด Padding ใน Section 1: General Info (p-5 ใน HTML) */
-            .a4-page div.border.border-black.p-5 {
-                padding: 0.75rem !important; /* COMPRESSED: ลดจาก 1.25rem */
+            .mb-6 { 
+                margin-bottom: 0.3rem !important; /* COMPRESSED: ลดเป็น 4.8px */
+                page-break-inside: avoid !important; 
             }
 
             /* ลด Padding ใน Table Cells เพื่อประหยัดพื้นที่แนวตั้ง */
             table th, table td {
-                padding: 5px 3px !important; 
+                padding: 4px 3px !important; /* ลดจาก 5px */
                 height: auto !important;
             }
             /* ลดความสูงของแถว Back-Leg Dynamometer */
             .h-14 {
-                height: 3rem !important; 
+                height: 2.5rem !important; /* ลดจาก 3rem */
             }
             
+            /* Table input box height reduction (20M/CR10) */
+            .border.border-gray-400 {
+                height: 2.25rem !important; /* ลดจาก 2.5rem */
+            }
+
             /* --- 3. การป้องกันการตัดแยกส่วนหลัก (Page Break Inside) --- */
-            /* ใช้ page-break-inside: avoid!important บนองค์ประกอบที่สำคัญทั้งหมด */
             .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
                 page-break-inside: avoid !important;
             }
 
-            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES --- */
-            
-            /* CRITICAL FIX: Ensure all input values are treated as static text for printing reliability */
+            /* --- 4. INPUT AND CHECKBOX FIDELITY FIXES (คงเดิม) --- */
             input, select {
                 box-shadow: none !important;
                 -webkit-appearance: none !important;
                 -moz-appearance: none !important;
                 appearance: none !important;
-                pointer-events: none !important; /* Disable interaction */
-                color: #000 !important; /* Ensure black text */
+                pointer-events: none !important; 
+                color: #000 !important;
                 user-select: none !important;
                 -webkit-user-select: none !important;
             }
             
-            /* Re-apply line border for specific inputs */
             .input-line, .input-date, select {
-                border-bottom: 1px solid #000 !important; /* Force black line */
+                border-bottom: 1px solid #000 !important; 
                 border-bottom-width: 1px !important; 
                 background-color: transparent !important;
             }
             
-            /* Reset table input styles */
             table input[type="text"], table input[type="number"] {
                 background: transparent !important;
                 text-align: center !important;
@@ -305,12 +299,6 @@
             .checkbox-option input[type="radio"], 
             .checkbox-option input[type="checkbox"] {
                 display: none !important;
-            }
-
-            .border.border-gray-400 {
-                border-color: #000 !important;
-                height: 2.5rem !important;
-                font-size: 1rem !important;
             }
         }
 
