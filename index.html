@@ -527,7 +527,7 @@
             });
         }
 
-        // Function to update numbering based on page index
+        // Function to update numbering based on page index AND ensure unique radio names
         function updatePageNumbering() {
             const allPages = document.querySelectorAll('.a4-page');
             allPages.forEach((page, index) => {
@@ -543,9 +543,20 @@
                 // 2. Update รหัสวิจัย (Research ID)
                 const researchIdInput = page.querySelector('.research-id-input');
                 if (researchIdInput) {
-                    // Assuming the research ID prefix is 'ช'
                     researchIdInput.value = `ช${formattedNumber}`; 
                 }
+
+                // 3. Update Radio Button Names to be unique per page (Critical for individual editing)
+                // This ensures "gender" on page 1 is different from "gender" on page 2
+                const genderRadios = page.querySelectorAll('input[name^="gender"]');
+                genderRadios.forEach(radio => {
+                    radio.name = `gender_${index}`;
+                });
+
+                const handRadios = page.querySelectorAll('input[name^="dominantHand"]');
+                handRadios.forEach(radio => {
+                    radio.name = `dominantHand_${index}`;
+                });
             });
         }
 
@@ -696,6 +707,37 @@
             });
         }
 
+        // --- NEW FUNCTION: Set Gender For All Pages ---
+        function setAllGender(genderValue) {
+            const allPages = document.querySelectorAll('.a4-page');
+            
+            allPages.forEach(page => {
+                // Find the radio button with the specified value (male/female)
+                // We use name^="gender" because names are unique (gender_0, gender_1...)
+                const targetRadio = page.querySelector(`input[value="${genderValue}"][name^="gender"]`);
+                
+                if (targetRadio) {
+                    // Check it
+                    targetRadio.checked = true;
+                    
+                    // Update visuals
+                    const parentControl = targetRadio.closest('.checkbox-control');
+                    if (parentControl) {
+                        parentControl.querySelectorAll('input[type="radio"]').forEach(radio => {
+                            const box = radio.closest('.checkbox-option').querySelector('.checkbox-box');
+                            if (radio.checked) {
+                                box.classList.add('checked');
+                            } else {
+                                box.classList.remove('checked');
+                            }
+                        });
+                    }
+                }
+            });
+            
+            // showCustomAlert(`ตั้งค่าเพศทั้งหมดเป็น "${genderValue === 'male' ? 'ชาย' : 'หญิง'}" เรียบร้อยแล้ว`);
+        }
+
         // Function to clear only imported fields (now clears all fields with data-field attribute)
         function clearImportedData() {
             const allPages = document.querySelectorAll('.a4-page');
@@ -810,16 +852,14 @@
             setTotalPages(1); 
             
             // Set up radio click listener for custom appearance
-            document.querySelectorAll('.checkbox-option').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    // Only trigger if clicking the label/container, not the hidden input itself
-                    if (e.target.tagName !== 'INPUT') { 
-                        toggleRadio(el); 
-                    }
-                });
-            });
-
-            // *** ส่วนนี้ถูกลบออกเพื่อให้ไม่มีการเลือกค่าเริ่มต้นสำหรับ เพศ และ ข้างที่ถนัด ***
+            // Note: Since setTotalPages now handles cloning, we delegate listener or re-attach
+            // But for the FIRST page which is static, we attach here.
+            // Actually, best to use event delegation or just attach to the static ones.
+            // The clone logic handles its own via cloneNode, but event listeners on nodes are not cloned by default.
+            // FIX: We need to re-attach listeners or use inline onclick (which we are using).
+            // inline onclick="toggleRadio(this)" is preserved in cloneNode(true). So this block is mostly for safety.
+            
+            // document.querySelectorAll('.checkbox-option').forEach(el => { ... }); -> Inline onclick is enough.
         };
     </script>
 </head>
@@ -856,6 +896,15 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
                     ล้างข้อมูลนำเข้า
                 </button>
+            </div>
+        </div>
+        
+        <!-- Gender Bulk Control (NEW FEATURE) -->
+        <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex flex-col gap-2 w-full">
+            <h4 class="text-xs font-bold text-gray-500 text-center uppercase tracking-wider">เลือกเพศ (ทั้งหมด)</h4>
+            <div class="flex gap-2">
+                 <button onclick="setAllGender('male')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm flex-1">ชาย</button>
+                 <button onclick="setAllGender('female')" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm flex-1">หญิง</button>
             </div>
         </div>
         
@@ -940,7 +989,7 @@
 
                 <!-- Section 1: General Info -->
                 <div class="mb-8 border border-black p-5 rounded-md">
-                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
+                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                         <div class="flex items-end">
