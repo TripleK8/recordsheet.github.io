@@ -37,11 +37,26 @@
             min-height: 297mm;
             background: white;
             margin: 0 auto; 
-            padding: 25mm 20mm; /* หน้าจอปกติ */
+            /* ปรับ Padding ของกระดาษเพื่อให้มีที่ว่างสำหรับกรอบ */
+            padding: 15mm; 
             box-shadow: 0 0 15px rgba(0,0,0,0.15);
             position: relative;
             box-sizing: border-box;
             border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Class สำหรับกรอบข้อมูล */
+        .page-frame {
+            border: 2px solid #000; /* เส้นขอบสีดำ */
+            padding: 20px; /* ระยะห่างจากขอบถึงเนื้อหา */
+            width: 100%;
+            flex: 1; /* ดึงให้เต็มความสูง */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
         }
 
         /* Input field styling for the underscore effect */
@@ -148,8 +163,8 @@
         /* Delete Button Position */
         .a4-page .delete-page-btn {
             position: absolute;
-            top: 15mm; 
-            left: 15mm; 
+            top: 5mm; 
+            left: 5mm; 
             z-index: 20;
             padding: 6px 10px;
             opacity: 1;
@@ -193,6 +208,13 @@
             .a4-page > div {
                 margin: 0 !important;
                 padding: 0 !important;
+            }
+
+            .page-frame {
+                border: 2px solid #000 !important;
+                padding: 15px !important;
+                height: auto !important;
+                flex: 1;
             }
 
             .no-print {
@@ -850,16 +872,6 @@
         window.onload = () => {
             // Initialize pages and numbering
             setTotalPages(1); 
-            
-            // Set up radio click listener for custom appearance
-            // Note: Since setTotalPages now handles cloning, we delegate listener or re-attach
-            // But for the FIRST page which is static, we attach here.
-            // Actually, best to use event delegation or just attach to the static ones.
-            // The clone logic handles its own via cloneNode, but event listeners on nodes are not cloned by default.
-            // FIX: We need to re-attach listeners or use inline onclick (which we are using).
-            // inline onclick="toggleRadio(this)" is preserved in cloneNode(true). So this block is mostly for safety.
-            
-            // document.querySelectorAll('.checkbox-option').forEach(el => { ... }); -> Inline onclick is enough.
         };
     </script>
 </head>
@@ -899,7 +911,7 @@
             </div>
         </div>
         
-        <!-- Gender Bulk Control (NEW FEATURE) -->
+        <!-- Gender Bulk Control -->
         <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex flex-col gap-2 w-full">
             <h4 class="text-xs font-bold text-gray-500 text-center uppercase tracking-wider">เลือกเพศ (ทั้งหมด)</h4>
             <div class="flex gap-2">
@@ -935,289 +947,291 @@
                 ลบหน้า
             </button>
 
-            <!-- Document Content -->
-            <div>
-                <!-- Header -->
-                <div class="text-center mb-6">
-                    <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
-                    <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
-                </div>
+            <!-- Page Frame Wrapper (New) -->
+            <div class="page-frame">
+                <!-- Document Content -->
+                <div>
+                    <!-- Header -->
+                    <div class="text-center mb-6">
+                        <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
+                        <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
+                    </div>
 
-                <!-- Training Center Name (Dropdown) -->
-                <div class="mb-4 flex items-end justify-center px-4 header-info">
-                    <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
-                    <select 
-                        class="input-line flex-1 text-center font-bold text-lg cursor-pointer trainingCenterSelect" 
-                        onchange="syncCenterSelection(this.value)"
-                    >
-                        <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
-                        <option value="ระยอง">ระยอง</option>
-                        <option value="ราชบุรี">ราชบุรี</option>
-                        <option value="บ้านชายกรุณา">ชายบ้านกรุณา</option>
-                        <option value="เชียงใหม่">เชียงใหม่</option>
-                        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-                        <option value="อุบลราชธานี">อุบลราชธานี</option>
-                    </select>
-                </div>
-
-                <!-- Test Date Selector (Updated to use Classes for cloning support) -->
-                <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
-                    <!-- Sync Date Checkbox -->
-                    <label class="flex items-center mr-4 cursor-pointer select-none no-print">
-                        <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
-                        <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
-                    </label>
-
-                    <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
-                    <!-- Custom Date Input with Icon -->
-                    <div class="relative w-40 flex items-center">
-                        <!-- Visible Input for Thai Format (pr-8 for icon space) -->
-                        <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
-                        
-                        <!-- Calendar Icon (Visual only) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        
-                        <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
-                        <input 
-                            type="date" 
-                            class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
-                            onchange="handleDateChange(this)" 
-                            style="height: 100%; border: none; z-index: 10;"
+                    <!-- Training Center Name (Dropdown) -->
+                    <div class="mb-4 flex items-end justify-center px-4 header-info">
+                        <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
+                        <select 
+                            class="input-line flex-1 text-center font-bold text-lg cursor-pointer trainingCenterSelect" 
+                            onchange="syncCenterSelection(this.value)"
                         >
-                    </div>
-                </div>
-
-                <!-- Section 1: General Info -->
-                <div class="mb-8 border border-black p-5 rounded-md">
-                    <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
-                            <!-- Input for automatic numbering -->
-                            <input type="text" class="input-line sequence-number-input" readonly>
-                        </div>
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
-                            <!-- Input for automatic numbering -->
-                            <input type="text" class="input-line research-id-input" readonly>
-                        </div>
+                            <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
+                            <option value="ระยอง">ระยอง</option>
+                            <option value="ราชบุรี">ราชบุรี</option>
+                            <option value="บ้านชายกรุณา">ชายบ้านกรุณา</option>
+                            <option value="เชียงใหม่">เชียงใหม่</option>
+                            <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                            <option value="อุบลราชธานี">อุบลราชธานี</option>
+                        </select>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
-                            <!-- MAPPED: Column 0 -->
-                            <input type="text" class="input-line" data-field="fullname">
-                        </div>
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
-                            <!-- MAPPED: Column 1 -->
-                            <input type="text" class="input-line" data-field="nickname">
+                    <!-- Test Date Selector (Updated to use Classes for cloning support) -->
+                    <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
+                        <!-- Sync Date Checkbox -->
+                        <label class="flex items-center mr-4 cursor-pointer select-none no-print">
+                            <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
+                            <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
+                        </label>
+
+                        <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
+                        <!-- Custom Date Input with Icon -->
+                        <div class="relative w-40 flex items-center">
+                            <!-- Visible Input for Thai Format (pr-8 for icon space) -->
+                            <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
+                            
+                            <!-- Calendar Icon (Visual only) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            
+                            <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
+                            <input 
+                                type="date" 
+                                class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
+                                onchange="handleDateChange(this)" 
+                                style="height: 100%; border: none; z-index: 10;"
+                            >
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
-                            <div class="flex w-full items-end">
-                                <!-- MAPPED: Column 2 -->
-                                <input type="number" class="input-line" data-field="age">
-                                <span class="ml-2 text-gray-700">ปี</span>
-                            </div>
-                        </div>
-                        <div></div> <!-- Placeholder to keep layout even -->
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
-                        <div class="flex items-center checkbox-control">
-                            <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
-                            <!-- REFACTORED to use hidden RADIO input -->
-                            <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
-                                <input type="radio" name="gender" value="male" class="hidden">
-                                <span class="checkbox-box"></span> ชาย
-                            </label>
-                            <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
-                                <input type="radio" name="gender" value="female" class="hidden">
-                                <span class="checkbox-box"></span> หญิง
-                            </label>
-                        </div>
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
-                            <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
-                            <input type="number" class="input-line" data-field="height">
-                            <span class="ml-2 text-gray-700">ซม.</span>
-                        </div>
-                        <div class="flex items-end">
-                            <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
-                            <input type="number" class="input-line">
-                            <span class="ml-2 text-gray-700">กก.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2: Body Composition -->
-                <div class="mb-8">
-                    <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
-                    <table class="label-table">
-                        <colgroup>
-                            <col style="width: 40%;">
-                            <col style="width: 30%;">
-                            <col style="width: 30%;">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th class="keep-together">รายการ (Item)</th>
-                                <th>Trial 1 (cm)</th>
-                                <th>Trial 2 (cm)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
-                                <!-- MAPPED: Column 5 and 6 -->
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist1"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist2"></td>
-                            </tr>
-                            <tr>
-                                <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
-                                <!-- MAPPED: Column 7 and 8 -->
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip1"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip2"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Section 3: Handgrip Strength -->
-                <div class="mb-8">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
-                        <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
-                        <div class="flex items-center checkbox-control">
-                            <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
-                            <!-- REFACTORED to use hidden RADIO input -->
-                            <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
-                                <input type="radio" name="dominantHand" value="right" class="hidden">
-                                <span class="checkbox-box"></span> ขวา
-                            </label>
-                            <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
-                                <input type="radio" name="dominantHand" value="left" class="hidden">
-                                <span class="checkbox-box"></span> ซ้าย
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <table class="label-table">
-                        <colgroup>
-                            <col style="width: 25%;">
-                            <col style="width: 25%;">
-                            <col style="width: 25%;">
-                            <col style="width: 25%;">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th class="keep-together py-2">ข้าง (Side)</th>
-                                <th class="py-2">Trial 1 (kg)</th>
-                                <th class="py-2">Trial 2 (kg)</th>
-                                <th class="py-2">Trial 3 (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            </tr>
-                            <tr>
-                                <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Section 4: Back-Leg Dynamometer -->
-                <div class="mb-8">
-                    <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
-                    <table>
-                        <colgroup>
-                            <col style="width: 33.33%;">
-                            <col style="width: 33.33%;">
-                            <col style="width: 33.33%;">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th class="py-2">Trial 1 (kg)</th>
-                                <th class="py-2">Trial 2 (kg)</th>
-                                <th class="py-2">Trial 3 (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="h-14">
-                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                                <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
-                <div class="mb-6">
-                    <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 section-5-grid">
+                    <!-- Section 1: General Info -->
+                    <div class="mb-8 border border-black p-5 rounded-md">
+                        <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
                         
-                        <!-- 20M-SRT (Updated to boxed style) -->
-                        <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                            <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
-                                20M-SRT Test (20m Shuttle Run Test)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
+                                <!-- Input for automatic numbering -->
+                                <input type="text" class="input-line sequence-number-input" readonly>
                             </div>
-                            <div class="p-6 text-center bg-gray-50">
-                                <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
-                                <div class="flex justify-center items-end gap-2">
-                                    <!-- MAPPED: Column 9 -->
-                                    <input 
-                                        type="number" 
-                                        min="0" 
-                                        class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-xl font-bold"
-                                        data-field="20m-laps"
-                                    >
-                                    <span class="mb-1 text-2xl text-gray-700">รอบ</span>
-                                </div>
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
+                                <!-- Input for automatic numbering -->
+                                <input type="text" class="input-line research-id-input" readonly>
                             </div>
                         </div>
 
-                        <!-- CR10 Scale -->
-                        <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                            <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
-                                CR10 Scale (ระดับความเหนื่อย)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
+                                <!-- MAPPED: Column 0 -->
+                                <input type="text" class="input-line" data-field="fullname">
                             </div>
-                            <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
-                                <div class="text-center">
-                                    <label class="block text-sm font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
-                                    <div class="flex justify-center items-center gap-1">
-                                        <!-- MAPPED: Column 10 -->
-                                        <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-cardio">
-                                        <span class="text-black ml-1 text-lg">/10</span>
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
+                                <!-- MAPPED: Column 1 -->
+                                <input type="text" class="input-line" data-field="nickname">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
+                                <div class="flex w-full items-end">
+                                    <!-- MAPPED: Column 2 -->
+                                    <input type="number" class="input-line" data-field="age">
+                                    <span class="ml-2 text-gray-700">ปี</span>
+                                </div>
+                            </div>
+                            <div></div> <!-- Placeholder to keep layout even -->
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
+                            <div class="flex items-center checkbox-control">
+                                <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
+                                <!-- REFACTORED to use hidden RADIO input -->
+                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                    <input type="radio" name="gender" value="male" class="hidden">
+                                    <span class="checkbox-box"></span> ชาย
+                                </label>
+                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                    <input type="radio" name="gender" value="female" class="hidden">
+                                    <span class="checkbox-box"></span> หญิง
+                                </label>
+                            </div>
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
+                                <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
+                                <input type="number" class="input-line" data-field="height">
+                                <span class="ml-2 text-gray-700">ซม.</span>
+                            </div>
+                            <div class="flex items-end">
+                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
+                                <input type="number" class="input-line">
+                                <span class="ml-2 text-gray-700">กก.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Body Composition -->
+                    <div class="mb-8">
+                        <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                        <table class="label-table">
+                            <colgroup>
+                                <col style="width: 40%;">
+                                <col style="width: 30%;">
+                                <col style="width: 30%;">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="keep-together">รายการ (Item)</th>
+                                    <th>Trial 1 (cm)</th>
+                                    <th>Trial 2 (cm)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
+                                    <!-- MAPPED: Column 5 and 6 -->
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist1"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist2"></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
+                                    <!-- MAPPED: Column 7 and 8 -->
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip1"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 3: Handgrip Strength -->
+                    <div class="mb-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
+                            <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
+                            <div class="flex items-center checkbox-control">
+                                <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
+                                <!-- REFACTORED to use hidden RADIO input -->
+                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                    <input type="radio" name="dominantHand" value="right" class="hidden">
+                                    <span class="checkbox-box"></span> ขวา
+                                </label>
+                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                    <input type="radio" name="dominantHand" value="left" class="hidden">
+                                    <span class="checkbox-box"></span> ซ้าย
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <table class="label-table">
+                            <colgroup>
+                                <col style="width: 25%;">
+                                <col style="width: 25%;">
+                                <col style="width: 25%;">
+                                <col style="width: 25%;">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="keep-together py-2">ข้าง (Side)</th>
+                                    <th class="py-2">Trial 1 (kg)</th>
+                                    <th class="py-2">Trial 2 (kg)</th>
+                                    <th class="py-2">Trial 3 (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 4: Back-Leg Dynamometer -->
+                    <div class="mb-8">
+                        <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
+                        <table>
+                            <colgroup>
+                                <col style="width: 33.33%;">
+                                <col style="width: 33.33%;">
+                                <col style="width: 33.33%;">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="py-2">Trial 1 (kg)</th>
+                                    <th class="py-2">Trial 2 (kg)</th>
+                                    <th class="py-2">Trial 3 (kg)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="h-14">
+                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 section-5-grid">
+                            
+                            <!-- 20M-SRT (Updated to boxed style) -->
+                            <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
+                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                    20M-SRT Test (20m Shuttle Run Test)
+                                </div>
+                                <div class="p-6 text-center bg-gray-50">
+                                    <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
+                                    <div class="flex justify-center items-end gap-2">
+                                        <!-- MAPPED: Column 9 -->
+                                        <input 
+                                            type="number" 
+                                            min="0" 
+                                            class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-xl font-bold"
+                                            data-field="20m-laps"
+                                        >
+                                        <span class="mb-1 text-2xl text-gray-700">รอบ</span>
                                     </div>
                                 </div>
-                                <div class="text-center">
-                                    <label class="block text-sm font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
-                                    <div class="flex justify-center items-center gap-1">
-                                        <!-- MAPPED: Column 11 -->
-                                        <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-muscle">
-                                        <span class="text-black ml-1 text-lg">/10</span>
+                            </div>
+
+                            <!-- CR10 Scale -->
+                            <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
+                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                    CR10 Scale (ระดับความเหนื่อย)
+                                </div>
+                                <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
+                                    <div class="text-center">
+                                        <label class="block text-sm font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
+                                        <div class="flex justify-center items-center gap-1">
+                                            <!-- MAPPED: Column 10 -->
+                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-cardio">
+                                            <span class="text-black ml-1 text-lg">/10</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <label class="block text-sm font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
+                                        <div class="flex justify-center items-center gap-1">
+                                            <!-- MAPPED: Column 11 -->
+                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-muscle">
+                                            <span class="text-black ml-1 text-lg">/10</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-            </div>
+            </div> <!-- End Page Frame -->
 
         </div>
     </div>
