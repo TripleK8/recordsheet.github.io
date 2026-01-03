@@ -68,7 +68,7 @@
             font-weight: 500;
             color: #000;
             background: transparent;
-            font-size: 16px;
+            font-size: 14px;
             text-align: center;
             transition: border-bottom-color 0.2s;
         }
@@ -87,7 +87,7 @@
             font-weight: 500;
             color: #000;
             background: transparent;
-            font-size: 16px;
+            font-size: 14px;
             text-align: left;
             appearance: none;
         }
@@ -96,37 +96,47 @@
         }
 
         /* --- UPDATED TABLE STYLING FOR ROUNDED CORNERS (Section 2, 3, 4) --- */
+        /* Force outer border visibility with !important to override any resets */
         table {
             width: 100%;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             table-layout: fixed;
-            /* Logic for rounded corners */
-            border-collapse: separate; 
+            
+            /* Rounded Corner Logic */
+            border-collapse: separate !important; 
             border-spacing: 0;
-            border: 1px solid #000;
-            border-radius: 12px; /* ความมนของขอบตาราง */
-            overflow: hidden; /* ตัดส่วนเกินที่มุมโค้ง */
+            
+            /* Outer Border Configuration */
+            border: 1px solid #000 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            
+            /* Ensure background doesn't leak */
+            background-clip: padding-box;
         }
         
         th, td {
-            padding: 8px 4px;
+            padding: 6px 4px;
             vertical-align: middle;
-            font-size: 15px;
-            /* เส้นขอบภายใน */
+            font-size: 13px;
+            
+            /* Internal Grid Lines Only */
             border-right: 1px solid #000;
             border-bottom: 1px solid #000;
+            
+            /* Remove default borders if any */
             border-left: none;
             border-top: none;
         }
         
-        /* ลบเส้นขอบขวาของคอลัมน์สุดท้าย */
+        /* Remove right border from last column so it doesn't double up with table border */
         th:last-child, td:last-child {
-            border-right: none;
+            border-right: none !important;
         }
         
-        /* ลบเส้นขอบล่างของแถวสุดท้ายในตาราง */
+        /* Remove bottom border from last row so it doesn't double up with table border */
         tbody tr:last-child td {
-            border-bottom: none;
+            border-bottom: none !important;
         }
 
         /* General Cell Alignment: Center */
@@ -150,13 +160,14 @@
         /* Custom Radio/Checkbox Styling */
         .checkbox-group {
             display: inline-flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             cursor: pointer;
+            font-size: 14px;
         }
         .checkbox-box {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border: 1px solid #000;
             display: inline-block;
             vertical-align: middle;
@@ -170,7 +181,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 14px;
+            font-size: 12px;
             color: #000;
         }
 
@@ -202,7 +213,7 @@
             body {
                 background: white;
                 margin: 0;
-                font-size: 16px !important; 
+                font-size: 14px !important;
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
                 display: block;
@@ -240,39 +251,39 @@
             }
             
             /* Print Font Sizing */
-            .text-3xl { font-size: 20pt !important; margin-bottom: 0 !important; } 
-            .text-xl { font-size: 14pt !important; }
-            .text-lg { font-size: 14pt !important; }
-            .text-base { font-size: 12pt !important; }
-            .text-sm { font-size: 10pt !important; }
+            .text-3xl { font-size: 18pt !important; margin-bottom: 0 !important; }
+            .text-2xl { font-size: 16pt !important; margin-bottom: 0 !important; }
+            .text-xl { font-size: 12pt !important; }
+            .text-lg { font-size: 11pt !important; }
+            .text-base { font-size: 10pt !important; }
+            .text-sm { font-size: 9pt !important; }
             .font-semibold { font-weight: 600 !important; }
 
             /* Spacing adjustments */
-            .a4-page .text-center.mb-6 { margin-bottom: 0.2rem !important; } 
+            .a4-page .text-center.mb-6 { margin-bottom: 0.1rem !important; } 
             .a4-page .header-info { margin-bottom: 0.1rem !important; } 
-            .mb-4 { margin-bottom: 0.2rem !important; } 
+            .mb-4 { margin-bottom: 0.1rem !important; } 
 
-            .a4-page div.border.border-black.p-5 { padding: 0.3rem !important; }
+            .a4-page div.border.border-black.p-5 { padding: 0.2rem !important; }
 
             .a4-page .grid-cols-2.mb-3 { margin-bottom: 0.1rem !important; }
-            .a4-page .grid-cols-3.mt-4 { margin-top: 0.2rem !important; }
+            .a4-page .grid-cols-3.mt-4 { margin-top: 0.1rem !important; }
 
-            .mb-8 { margin-bottom: 0.3rem !important; page-break-inside: avoid !important; }
+            .mb-8 { margin-bottom: 0.2rem !important; page-break-inside: avoid !important; }
             .mb-6 { margin-bottom: 0.2rem !important; page-break-inside: avoid !important; }
 
             /* Table padding reduction */
             table th, table td {
                 padding: 2px 3px !important; 
                 height: auto !important;
-                /* Note: Borders handled by main CSS */
             }
-            .h-14 { height: 1.8rem !important; }
+            .h-14 { height: 1.6rem !important; }
             
-            .border.border-gray-400 { height: 1.8rem !important; }
+            .border.border-gray-400 { height: 1.6rem !important; }
 
-            .section-5-box .p-6 { padding: 0.3rem !important; }
-            .section-5-grid { gap: 0.5rem !important; }
-            .section-5-box .bg-gray-200 { padding: 0.2rem !important; }
+            .section-5-box .p-6 { padding: 0.2rem !important; }
+            .section-5-grid { gap: 0.4rem !important; }
+            .section-5-box .bg-gray-200 { padding: 0.1rem !important; }
 
             .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
                 page-break-inside: avoid !important;
@@ -291,6 +302,7 @@
                 border-bottom: 1px solid #000 !important; 
                 border-bottom-width: 1px !important; 
                 background-color: transparent !important;
+                font-size: 10pt !important;
             }
             
             table input[type="text"], table input[type="number"] {
@@ -914,15 +926,15 @@
                 <div>
                     <!-- Header -->
                     <div class="text-center mb-6">
-                        <h1 class="text-3xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
-                        <h2 class="text-xl text-gray-600 font-light">(Data Collection Record Sheet)</h2>
+                        <h1 class="text-2xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
+                        <h2 class="text-lg text-gray-600 font-light">(Data Collection Record Sheet)</h2>
                     </div>
 
                     <!-- Training Center Name (Dropdown) -->
                     <div class="mb-4 flex items-end justify-center px-4 header-info">
-                        <span class="font-bold text-lg mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
+                        <span class="font-bold text-base mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
                         <select 
-                            class="input-line flex-1 text-center font-bold text-lg cursor-pointer trainingCenterSelect" 
+                            class="input-line flex-1 text-center font-bold text-base cursor-pointer trainingCenterSelect" 
                             onchange="syncCenterSelection(this.value)"
                         >
                             <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
@@ -940,14 +952,14 @@
                         <!-- Sync Date Checkbox -->
                         <label class="flex items-center mr-4 cursor-pointer select-none no-print">
                             <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
-                            <span class="text-sm font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
+                            <span class="text-xs font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
                         </label>
 
-                        <span class="font-bold text-lg mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
+                        <span class="font-bold text-base mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
                         <!-- Custom Date Input with Icon -->
                         <div class="relative w-40 flex items-center">
                             <!-- Visible Input for Thai Format (pr-8 for icon space) -->
-                            <input type="text" class="input-date w-full text-lg pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
+                            <input type="text" class="input-date w-full text-base pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
                             
                             <!-- Calendar Icon (Visual only) -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -964,16 +976,16 @@
 
                     <!-- Section 1: General Info -->
                     <div class="mb-8 border border-black p-5 rounded-md">
-                        <h3 class="font-bold text-xl mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
+                        <h3 class="font-bold text-lg mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ลำดับที่:</span>
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ลำดับที่:</span>
                                 <!-- Input for automatic numbering -->
                                 <input type="text" class="input-line sequence-number-input" readonly>
                             </div>
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">รหัสวิจัย:</span>
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">รหัสวิจัย:</span>
                                 <!-- Input for automatic numbering -->
                                 <input type="text" class="input-line research-id-input" readonly>
                             </div>
@@ -981,12 +993,12 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อจริง:</span>
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ชื่อจริง:</span>
                                 <!-- MAPPED: Column 0 -->
                                 <input type="text" class="input-line" data-field="fullname">
                             </div>
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">ชื่อเล่น:</span>
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ชื่อเล่น:</span>
                                 <!-- MAPPED: Column 1 -->
                                 <input type="text" class="input-line" data-field="nickname">
                             </div>
@@ -994,11 +1006,11 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700">อายุ:</span>
+                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">อายุ:</span>
                                 <div class="flex w-full items-end">
                                     <!-- MAPPED: Column 2 -->
                                     <input type="number" class="input-line" data-field="age">
-                                    <span class="ml-2 text-gray-700">ปี</span>
+                                    <span class="ml-2 text-gray-700 text-base">ปี</span>
                                 </div>
                             </div>
                             <div></div> <!-- Placeholder to keep layout even -->
@@ -1006,7 +1018,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
                             <div class="flex items-center checkbox-control">
-                                <span class="font-semibold mr-4 w-16 text-gray-700">เพศ:</span>
+                                <span class="font-semibold mr-4 w-16 text-gray-700 text-base">เพศ:</span>
                                 <!-- REFACTORED to use hidden RADIO input -->
                                 <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
                                     <input type="radio" name="gender" value="male" class="hidden">
@@ -1018,22 +1030,22 @@
                                 </label>
                             </div>
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">ส่วนสูง:</span>
+                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700 text-base">ส่วนสูง:</span>
                                 <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
                                 <input type="number" class="input-line" data-field="height">
-                                <span class="ml-2 text-gray-700">ซม.</span>
+                                <span class="ml-2 text-gray-700 text-base">ซม.</span>
                             </div>
                             <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700">น้ำหนัก:</span>
+                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700 text-base">น้ำหนัก:</span>
                                 <input type="number" class="input-line">
-                                <span class="ml-2 text-gray-700">กก.</span>
+                                <span class="ml-2 text-gray-700 text-base">กก.</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Section 2: Body Composition -->
                     <div class="mb-8">
-                        <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                        <h3 class="font-bold text-lg mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
                         <table class="label-table">
                             <colgroup>
                                 <col style="width: 40%;">
@@ -1067,9 +1079,9 @@
                     <!-- Section 3: Handgrip Strength -->
                     <div class="mb-8">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
-                            <h3 class="font-bold text-xl keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
+                            <h3 class="font-bold text-lg keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
                             <div class="flex items-center checkbox-control">
-                                <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap">ข้างที่ถนัด (Dominant):</span>
+                                <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap text-base">ข้างที่ถนัด (Dominant):</span>
                                 <!-- REFACTORED to use hidden RADIO input -->
                                 <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
                                     <input type="radio" name="dominantHand" value="right" class="hidden">
@@ -1116,7 +1128,7 @@
 
                     <!-- Section 4: Back-Leg Dynamometer -->
                     <div class="mb-8">
-                        <h3 class="font-bold text-xl mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
+                        <h3 class="font-bold text-lg mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
                         <table>
                             <colgroup>
                                 <col style="width: 33.33%;">
@@ -1142,49 +1154,49 @@
 
                     <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
                     <div class="mb-6">
-                        <h3 class="font-bold text-xl mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
+                        <h3 class="font-bold text-lg mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 section-5-grid">
                             
                             <!-- 20M-SRT (Updated to boxed style) -->
                             <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-base">
                                     20M-SRT Test (20m Shuttle Run Test)
                                 </div>
                                 <div class="p-6 text-center bg-gray-50">
-                                    <label class="block text-base font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
+                                    <label class="block text-sm font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
                                     <div class="flex justify-center items-end gap-2">
                                         <!-- MAPPED: Column 9 -->
                                         <input 
                                             type="number" 
                                             min="0" 
-                                            class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-xl font-bold"
+                                            class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-lg font-bold"
                                             data-field="20m-laps"
                                         >
-                                        <span class="mb-1 text-2xl text-gray-700">รอบ</span>
+                                        <span class="mb-1 text-xl text-gray-700">รอบ</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- CR10 Scale -->
                             <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-lg">
+                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-base">
                                     CR10 Scale (ระดับความเหนื่อย)
                                 </div>
                                 <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
                                     <div class="text-center">
-                                        <label class="block text-sm font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
+                                        <label class="block text-xs font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
                                         <div class="flex justify-center items-center gap-1">
                                             <!-- MAPPED: Column 10 -->
-                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-cardio">
-                                            <span class="text-black ml-1 text-lg">/10</span>
+                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-lg font-bold" data-field="cr10-cardio">
+                                            <span class="text-black ml-1 text-base">/10</span>
                                         </div>
                                     </div>
                                     <div class="text-center">
-                                        <label class="block text-sm font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
+                                        <label class="block text-xs font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
                                         <div class="flex justify-center items-center gap-1">
                                             <!-- MAPPED: Column 11 -->
-                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-xl font-bold" data-field="cr10-muscle">
-                                            <span class="text-black ml-1 text-lg">/10</span>
+                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-lg font-bold" data-field="cr10-muscle">
+                                            <span class="text-black ml-1 text-base">/10</span>
                                         </div>
                                     </div>
                                 </div>
