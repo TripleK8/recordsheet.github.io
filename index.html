@@ -682,25 +682,36 @@
         }
         
         // Function to handle custom radio selection
-        function toggleRadio(labelElement) {
-            const group = labelElement.closest('.checkbox-option');
-            const inputRadio = group.querySelector('input[type="radio"]');
+        function toggleRadio(labelElement, event) {
+            // Prevent default label click behavior (which forces radio check)
+            // This is CRITICAL for allowing uncheck
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const inputRadio = labelElement.querySelector('input[type="radio"]');
             const parentControl = labelElement.closest('.checkbox-control');
+            const currentBox = labelElement.querySelector('.checkbox-box');
 
             if (!inputRadio) return;
 
-            // 1. Set the clicked radio button to checked
-            inputRadio.checked = true;
+            // Check current visual state (use class because input state might be tricky with default events)
+            const isChecked = currentBox.classList.contains('checked');
 
-            // 2. Update visual state for all radios in the group
+            // Reset ALL radios in this group (both visually and internally)
             parentControl.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
                 const box = radio.closest('.checkbox-option').querySelector('.checkbox-box');
-                if (radio.checked) {
-                    box.classList.add('checked');
-                } else {
-                    box.classList.remove('checked');
-                }
+                if (box) box.classList.remove('checked');
             });
+
+            // Logic: Toggle. If it wasn't checked before, check it now.
+            // If it WAS checked, we effectively unchecked it in the reset step above.
+            if (!isChecked) {
+                inputRadio.checked = true;
+                currentBox.classList.add('checked');
+            }
         }
 
         // --- NEW FUNCTION: Set Gender For All Pages ---
@@ -1021,11 +1032,11 @@
                             <div class="flex items-center checkbox-control">
                                 <span class="font-semibold mr-4 w-16 text-gray-700 text-base">เพศ:</span>
                                 <!-- REFACTORED to use hidden RADIO input -->
-                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this, event)">
                                     <input type="radio" name="gender" value="male" class="hidden">
                                     <span class="checkbox-box"></span> ชาย
                                 </label>
-                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this, event)">
                                     <input type="radio" name="gender" value="female" class="hidden">
                                     <span class="checkbox-box"></span> หญิง
                                 </label>
@@ -1084,11 +1095,11 @@
                             <div class="flex items-center checkbox-control">
                                 <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap text-base">ข้างที่ถนัด (Dominant):</span>
                                 <!-- REFACTORED to use hidden RADIO input -->
-                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this)">
+                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this, event)">
                                     <input type="radio" name="dominantHand" value="right" class="hidden">
                                     <span class="checkbox-box"></span> ขวา
                                 </label>
-                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this)">
+                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this, event)">
                                     <input type="radio" name="dominantHand" value="left" class="hidden">
                                     <span class="checkbox-box"></span> ซ้าย
                                 </label>
