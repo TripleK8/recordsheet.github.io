@@ -189,7 +189,7 @@
             cursor: not-allowed;
         }
 
-        /* --- Print Media Query --- */
+        /* --- Print Media Query (Fitted to 1 page) --- */
         @media print {
             @page {
                 size: A4 portrait;
@@ -198,7 +198,7 @@
             body {
                 background: white;
                 margin: 0;
-                font-size: 14px !important;
+                font-size: 13px !important;
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
                 display: block;
@@ -209,18 +209,20 @@
                 margin: 0;
                 page-break-after: always;
                 width: 210mm !important; 
-                min-height: 297mm !important; 
-                height: auto !important; 
+                height: 297mm !important; 
+                min-height: 297mm !important;
                 overflow: hidden !important; 
-                padding: 10mm 15mm 10mm 15mm !important; 
+                padding: 5mm 8mm !important; /* Reduced padding for more space */
                 border-radius: 0;
+                box-sizing: border-box;
             }
 
             .page-frame {
-                border: none !important;
-                padding: 0 !important;   
-                height: auto !important;
+                border: 2px solid #000 !important;
+                padding: 10px !important;   /* Reduced internal padding */
+                height: 100% !important;
                 flex: 1;
+                box-sizing: border-box;
             }
 
             table {
@@ -228,11 +230,12 @@
                 border-radius: 0 !important;
                 border: 1px solid #000 !important;
                 border-spacing: 0 !important;
-                overflow: visible !important;
+                margin-bottom: 0.5rem !important;
             }
             
             th, td {
                 border: 1px solid #000 !important; 
+                padding: 2px 4px !important; /* Tighter cells */
             }
             
             th:last-child, td:last-child {
@@ -249,17 +252,18 @@
                 display: none !important;
             }
             
-            .text-3xl { font-size: 18pt !important; }
-            .text-2xl { font-size: 16pt !important; }
-            .text-xl { font-size: 12pt !important; }
-            .text-lg { font-size: 11pt !important; }
-            .text-base { font-size: 10pt !important; }
-            .text-sm { font-size: 9pt !important; }
+            /* Tighten up margins */
+            .mb-8 { margin-bottom: 0.5rem !important; }
+            .mb-6 { margin-bottom: 0.5rem !important; }
+            .mb-4 { margin-bottom: 0.25rem !important; }
+            .mt-4 { margin-top: 0.25rem !important; }
+            .p-5 { padding: 8px !important; }
 
-            table th, table td {
-                padding: 2px 3px !important; 
-            }
-            
+            .text-2xl { font-size: 16pt !important; margin-bottom: 0 !important; }
+            .text-lg { font-size: 10pt !important; }
+            .text-base { font-size: 9pt !important; }
+            .text-sm { font-size: 8pt !important; }
+
             input, select {
                 box-shadow: none !important;
                 appearance: none !important;
@@ -270,6 +274,13 @@
             .input-line, .input-date, select {
                 border-bottom: 1px solid #000 !important; 
                 background-color: transparent !important;
+                font-size: 9pt !important;
+            }
+
+            /* Ensure checkboxes render */
+            .checkbox-box {
+                border: 1px solid #000 !important;
+                print-color-adjust: exact;
             }
         }
 
