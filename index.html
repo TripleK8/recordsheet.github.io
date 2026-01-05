@@ -46,7 +46,7 @@
             flex-direction: column;
         }
 
-        /* Class สำหรับกรอบข้อมูล */
+        /* Class สำหรับกรอบข้อมูล (เฉพาะบนหน้าจอ) */
         .page-frame {
             border: 2px solid #000;
             padding: 20px;
@@ -58,7 +58,7 @@
             position: relative;
         }
 
-        /* Input field styling for the underscore effect */
+        /* Input field styling */
         .input-line {
             border: none;
             border-bottom: 1px solid #9ca3af;
@@ -76,7 +76,6 @@
             border-bottom: 2px solid #2563eb;
         }
 
-        /* Styling for Date Input (to look like input-line) */
         .input-date {
             font-family: inherit;
             border: none;
@@ -91,27 +90,17 @@
             text-align: left;
             appearance: none;
         }
-        .input-date:focus {
-             border-bottom: 2px solid #2563eb;
-        }
 
-        /* --- UPDATED TABLE STYLING FOR ROUNDED CORNERS (Section 2, 3, 4) --- */
-        /* Force outer border visibility with !important to override any resets */
+        /* ตารางบนหน้าจอ: ขอบมน */
         table {
             width: 100%;
             margin-bottom: 1.2rem;
             table-layout: fixed;
-            
-            /* Rounded Corner Logic */
-            border-collapse: separate !important; 
+            border-collapse: separate; 
             border-spacing: 0;
-            
-            /* Outer Border Configuration */
-            border: 1px solid #000 !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-            
-            /* Ensure background doesn't leak */
+            border: 1px solid #000;
+            border-radius: 12px;
+            overflow: hidden;
             background-clip: padding-box;
         }
         
@@ -119,660 +108,243 @@
             padding: 6px 4px;
             vertical-align: middle;
             font-size: 13px;
-            
-            /* Internal Grid Lines Only */
             border-right: 1px solid #000;
             border-bottom: 1px solid #000;
-            
-            /* Remove default borders if any */
             border-left: none;
             border-top: none;
         }
         
-        /* Remove right border from last column so it doesn't double up with table border */
-        th:last-child, td:last-child {
-            border-right: none !important;
-        }
+        th:last-child, td:last-child { border-right: none; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        td { text-align: center; }
+        .label-table td:first-child { text-align: left !important; padding-left: 12px; }
+        th { background-color: #e5e7eb; font-weight: bold; color: #000; text-align: center !important; }
         
-        /* Remove bottom border from last row so it doesn't double up with table border */
-        tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        /* General Cell Alignment: Center */
-        td {
-            text-align: center;
-        }
-
-        /* Specific fix: Left align the first column ONLY for tables with class .label-table */
-        .label-table td:first-child {
-            text-align: left !important;
-            padding-left: 12px;
-        }
-
-        th {
-            background-color: #e5e7eb;
-            font-weight: bold;
-            color: #000;
-            text-align: center !important;
-        }
-        
-        /* Custom Radio/Checkbox Styling */
-        .checkbox-group {
-            display: inline-flex;
-            gap: 8px;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-        }
+        /* Custom Checkbox Appearance */
+        .checkbox-group { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; }
         .checkbox-box {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #000;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 4px;
-            background-color: white;
-            position: relative;
+            width: 16px; height: 16px; border: 1px solid #000; display: inline-block;
+            vertical-align: middle; margin-right: 4px; background-color: white; position: relative;
         }
         .checkbox-box.checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            color: #000;
+            content: '✓'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 12px; color: #000;
         }
 
-        .keep-together {
-            white-space: nowrap;
-        }
-        
-        /* Delete Button Position */
-        .a4-page .delete-page-btn {
-            position: absolute;
-            top: 5mm; 
-            left: 5mm; 
-            z-index: 20;
-            padding: 6px 10px;
-            opacity: 1;
-            cursor: pointer;
-        }
-        .a4-page .delete-page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .delete-page-btn { position: absolute; top: 5mm; left: 5mm; z-index: 20; padding: 6px 10px; cursor: pointer; }
 
-        /* --- Print Media Query for A4 layout (Strict Fidelity Fix) --- */
+        /* --- Print Media Query: Optimized for PDF Fidelity --- */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0; 
-            }
-            body {
-                background: white;
-                margin: 0;
-                font-size: 14px !important;
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important; 
-                display: block;
-                padding: 0 !important;
-            }
+            @page { size: A4 portrait; margin: 0; }
+            body { background: white; margin: 0; font-size: 14px !important; display: block; padding: 0 !important; }
+            
             .a4-page {
-                box-shadow: none;
-                margin: 0;
-                page-break-after: always;
-                width: 210mm !important; 
-                min-height: 297mm !important; 
-                height: auto !important; 
-                overflow: hidden !important; 
-                padding: 10mm 15mm 10mm 15mm !important; 
-                border-radius: 0;
+                box-shadow: none; margin: 0; page-break-after: always;
+                width: 210mm !important; min-height: 297mm !important;
+                padding: 10mm 15mm !important; border-radius: 0;
             }
 
-            .a4-page > div {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
+            .page-frame { border: none !important; padding: 0 !important; }
 
-            /* --- FIX: Remove page-frame border when printing --- */
-            .page-frame {
-                border: none !important; /* No border on print */
-                padding: 0 !important;   /* Reduce padding inside frame on print */
-                height: auto !important;
-                flex: 1;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-            .delete-page-btn, #custom-modal-overlay {
-                display: none !important;
+            /* แก้ปัญหาเส้นตารางหาย: บังคับใช้ collapse และวาดเส้นใหม่ทุกด้าน */
+            table {
+                border-collapse: collapse !important;
+                border: 1px solid #000 !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
+                margin-bottom: 1rem !important;
             }
             
-            /* Print Font Sizing */
-            .text-3xl { font-size: 18pt !important; margin-bottom: 0 !important; }
-            .text-2xl { font-size: 16pt !important; margin-bottom: 0 !important; }
-            .text-xl { font-size: 12pt !important; }
+            th, td {
+                border: 1px solid #000 !important; /* บังคับเส้นขอบดำสนิท */
+                padding: 4px 2px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .no-print, .delete-page-btn, #custom-modal-overlay { display: none !important; }
+            
+            .text-2xl { font-size: 16pt !important; }
             .text-lg { font-size: 11pt !important; }
             .text-base { font-size: 10pt !important; }
-            .text-sm { font-size: 9pt !important; }
-            .font-semibold { font-weight: 600 !important; }
-
-            /* Spacing adjustments */
-            .a4-page .text-center.mb-6 { margin-bottom: 0.1rem !important; } 
-            .a4-page .header-info { margin-bottom: 0.1rem !important; } 
-            .mb-4 { margin-bottom: 0.1rem !important; } 
-
-            .a4-page div.border.border-black.p-5 { padding: 0.2rem !important; }
-
-            .a4-page .grid-cols-2.mb-3 { margin-bottom: 0.1rem !important; }
-            .a4-page .grid-cols-3.mt-4 { margin-top: 0.1rem !important; }
-
-            .mb-8 { margin-bottom: 0.2rem !important; page-break-inside: avoid !important; }
-            .mb-6 { margin-bottom: 0.2rem !important; page-break-inside: avoid !important; }
-
-            /* Table padding reduction */
-            table th, table td {
-                padding: 2px 3px !important; 
-                height: auto !important;
-            }
-            .h-14 { height: 1.6rem !important; }
-            
-            .border.border-gray-400 { height: 1.6rem !important; }
-
-            .section-5-box .p-6 { padding: 0.2rem !important; }
-            .section-5-grid { gap: 0.4rem !important; }
-            .section-5-box .bg-gray-200 { padding: 0.1rem !important; }
-
-            .a4-page > div > div, .a4-page table, .a4-page > div > div > div { 
-                page-break-inside: avoid !important;
-            }
-
-            input, select {
-                box-shadow: none !important;
-                -webkit-appearance: none !important;
-                -moz-appearance: none !important;
-                appearance: none !important;
-                pointer-events: none !important; 
-                color: #000 !important;
-            }
             
             .input-line, .input-date, select {
-                border-bottom: 1px solid #000 !important; 
-                border-bottom-width: 1px !important; 
-                background-color: transparent !important;
+                border-bottom: 1px solid #000 !important;
                 font-size: 10pt !important;
             }
-            
-            table input[type="text"], table input[type="number"] {
-                background: transparent !important;
-                text-align: center !important;
-                padding: 0 !important; 
-                border: none !important;
-            }
-            
-            .checkbox-box { border: 1px solid #000 !important; }
-            .checkbox-box.checked::after {
-                content: '✓' !important;
-                color: #000 !important;
-                -webkit-text-fill-color: #000 !important; 
-            }
-            .checkbox-option input[type="radio"], 
-            .checkbox-option input[type="checkbox"] {
-                display: none !important;
-            }
-        }
-
-        /* Mobile Optimization */
-        @media (max-width: 768px) {
-            body { align-items: flex-start; display: block; padding: 10px; }
-            .a4-page { width: 95%; padding: 15px; margin: 0 auto 20px auto; }
-            .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; }
-            .delete-page-btn { top: 10px !important; left: 10px !important; }
-            .fixed.top-4.right-4 { top: 10px; right: 10px; flex-direction: column; gap: 10px; }
         }
     </style>
     <script>
-        // Thai month abbreviations for date formatting
-        const THAI_MONTHS_SHORT = [
-            "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", 
-            "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
-        ];
+        const THAI_MONTHS_SHORT = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
-        // Function to convert ISO date string to Thai format (D M. YYYY BE)
         function formatDateToThai(isoDateString) {
             if (!isoDateString) return '';
             try {
                 const date = new Date(isoDateString);
-                if (isNaN(date.getTime())) return 'Invalid Date'; 
-
-                const day = date.getDate();
-                const monthThai = THAI_MONTHS_SHORT[date.getMonth()];
-                // Thai year is Buddhist Era (BE) = Gregorian (CE) + 543
-                const yearThai = date.getFullYear() + 543; 
-
-                return `${day} ${monthThai} ${yearThai}`;
-            } catch (e) {
-                console.error("Date formatting error:", e);
-                return '';
-            }
+                if (isNaN(date.getTime())) return ''; 
+                return `${date.getDate()} ${THAI_MONTHS_SHORT[date.getMonth()]} ${date.getFullYear() + 543}`;
+            } catch (e) { return ''; }
         }
 
-        // --- Custom Alert/Confirm Functions (Replaces native alert/confirm) ---
-        let customModalResolve = null;
-
+        // --- Custom Alert/Confirm ---
         function showCustomAlert(message) {
             const modal = document.getElementById('custom-modal');
-            const messageEl = document.getElementById('modal-message');
-            const confirmBtn = document.getElementById('modal-confirm-btn');
-            const cancelBtn = document.getElementById('modal-cancel-btn');
-            const overlay = document.getElementById('custom-modal-overlay');
-
-            messageEl.innerHTML = message.replace(/\n/g, '<br>');
-            confirmBtn.textContent = 'ตกลง';
-            cancelBtn.classList.add('hidden'); // Hide cancel button for alerts
-
-            return new Promise(resolve => {
-                customModalResolve = resolve;
-                confirmBtn.onclick = () => {
-                    hideCustomModal();
-                    resolve(true);
-                };
-                modal.classList.remove('hidden');
-                overlay.classList.remove('hidden');
-            });
+            document.getElementById('modal-message').innerHTML = message.replace(/\n/g, '<br>');
+            document.getElementById('modal-confirm-btn').onclick = () => {
+                document.getElementById('custom-modal').classList.add('hidden');
+                document.getElementById('custom-modal-overlay').classList.add('hidden');
+            };
+            document.getElementById('modal-cancel-btn').classList.add('hidden');
+            modal.classList.remove('hidden');
+            document.getElementById('custom-modal-overlay').classList.remove('hidden');
         }
 
         function showCustomConfirm(message, callback) {
             const modal = document.getElementById('custom-modal');
-            const messageEl = document.getElementById('modal-message');
+            document.getElementById('modal-message').innerHTML = message.replace(/\n/g, '<br>');
             const confirmBtn = document.getElementById('modal-confirm-btn');
             const cancelBtn = document.getElementById('modal-cancel-btn');
-            const overlay = document.getElementById('custom-modal-overlay');
+            
+            cancelBtn.classList.remove('hidden');
+            confirmBtn.onclick = () => { hideModal(); callback(true); };
+            cancelBtn.onclick = () => { hideModal(); callback(false); };
 
-            messageEl.innerHTML = message.replace(/\n/g, '<br>');
-            confirmBtn.textContent = 'ยืนยัน';
-            cancelBtn.classList.remove('hidden'); // Show cancel button for confirms
-            cancelBtn.textContent = 'ยกเลิก';
-
-            confirmBtn.onclick = () => {
-                hideCustomModal();
-                callback(true);
-            };
-            cancelBtn.onclick = () => {
-                hideCustomModal();
-                callback(false);
-            };
-
+            function hideModal() {
+                modal.classList.add('hidden');
+                document.getElementById('custom-modal-overlay').classList.add('hidden');
+            }
             modal.classList.remove('hidden');
-            overlay.classList.remove('hidden');
+            document.getElementById('custom-modal-overlay').classList.remove('hidden');
         }
 
-        function hideCustomModal() {
-            document.getElementById('custom-modal').classList.add('hidden');
-            document.getElementById('custom-modal-overlay').classList.add('hidden');
-        }
-        // --- End Custom Alert/Confirm Functions ---
-
-
-        // Function to handle Radio Checkbox Sync
-        function syncDateCheckboxes(sourceCheckbox) {
-            const isChecked = sourceCheckbox.checked;
-            const allSyncCheckboxes = document.querySelectorAll('.sync-date-checkbox');
-            
-            // 1. Update all checkboxes to match
-            allSyncCheckboxes.forEach(cb => {
-                cb.checked = isChecked;
-            });
-
-            // 2. If checked, sync date value from this page to all others
-            if (isChecked) {
-                const sourcePage = sourceCheckbox.closest('.a4-page');
-                const sourceDateInput = sourcePage.querySelector('.testDateHidden');
-                const dateValue = sourceDateInput.value;
-                
-                if (dateValue) {
-                    const allHiddenInputs = document.querySelectorAll('.testDateHidden');
-                    allHiddenInputs.forEach(input => {
-                        input.value = dateValue;
-                        // Force update display
-                        const container = input.closest('.date-control');
-                        const display = container.querySelector('.testDateDisplay');
-                        if (display) display.value = formatDateToThai(dateValue);
-                    });
-                }
-            }
-        }
-
-        // Function to handle date change for ANY date picker (uses element reference)
-        function handleDateChange(hiddenInput) {
-            const isoDateString = hiddenInput.value;
-            const dateContainer = hiddenInput.closest('.date-control');
-            const displayInput = dateContainer.querySelector('.testDateDisplay');
-            
-            if (displayInput) {
-                displayInput.value = formatDateToThai(isoDateString);
-            }
-
-            // Sync Logic
-            const page = hiddenInput.closest('.a4-page');
-            if (!page) return;
-            const syncCheckbox = page.querySelector('.sync-date-checkbox');
-            
-            if (syncCheckbox && syncCheckbox.checked) {
-                const allHiddenInputs = document.querySelectorAll('.testDateHidden');
-                allHiddenInputs.forEach(input => {
-                    if (input !== hiddenInput) {
-                        input.value = isoDateString;
-                        const container = input.closest('.date-control');
-                        const display = container.querySelector('.testDateDisplay');
-                        if (display) display.value = formatDateToThai(isoDateString);
-                    }
-                });
-            }
-        }
-
-        // Function to set today's date on a specific date control container
-        function initializeDateControl(controlElement) {
-            const today = new Date().toISOString().split('T')[0];
-            const hiddenInput = controlElement.querySelector('.testDateHidden');
-            
-            if (hiddenInput) {
-                hiddenInput.value = today;
-                handleDateChange(hiddenInput);
-            }
-        }
-        
-        // Function to clear all interactive fields (inputs and checkboxes) on a cloned element
-        function clearPageInputs(pageElement) {
-            // Clear text/number inputs, except for the ones we manage automatically
-            pageElement.querySelectorAll('input[type="text"], input[type="number"], select').forEach(input => {
-                 // Skip dropdown reset during cloning, as we sync it below
-                 if (!input.classList.contains('trainingCenterSelect') && !input.classList.contains('sequence-number-input') && !input.classList.contains('research-id-input')) {
-                     input.value = '';
-                 }
-            });
-
-            // Clear checkboxes/radios (uncheck all) (EXCEPT SYNC DATE CHECKBOX)
-            pageElement.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(box => {
-                if (!box.classList.contains('sync-date-checkbox')) {
-                    box.checked = false; // standard checkbox
-                    // Find and remove checked class from custom box
-                    const customBox = box.closest('.checkbox-option')?.querySelector('.checkbox-box');
-                    if(customBox) customBox.classList.remove('checked'); 
-                }
-            });
-        }
-        
-        // Function to synchronize the center selection across all pages
-        function syncCenterSelection(selectedValue) {
-            const allSelects = document.querySelectorAll('.trainingCenterSelect');
-            
-            // If selectedValue is not explicitly passed (e.g., called from setTotalPages), 
-            // grab the value from the first element.
-            if (selectedValue === undefined) {
-                const firstSelect = allSelects[0];
-                selectedValue = firstSelect ? firstSelect.value : '';
-            }
-            
-            // Apply the selected value to all dropdowns
-            allSelects.forEach(select => {
-                select.value = selectedValue;
-            });
-        }
-
-        // Function to update numbering based on page index AND ensure unique radio names
-        function updatePageNumbering() {
-            const allPages = document.querySelectorAll('.a4-page');
-            allPages.forEach((page, index) => {
-                const pageNumber = index + 1; // 1, 2, 3...
-                const formattedNumber = pageNumber.toString().padStart(3, '0'); // 001, 002...
-
-                // 1. Update ลำดับที่ (Sequence Number)
-                const sequenceInput = page.querySelector('.sequence-number-input');
-                if (sequenceInput) {
-                    sequenceInput.value = formattedNumber;
-                }
-
-                // 2. Update รหัสวิจัย (Research ID)
-                const researchIdInput = page.querySelector('.research-id-input');
-                if (researchIdInput) {
-                    researchIdInput.value = `ช${formattedNumber}`; 
-                }
-
-                // 3. Update Radio Button Names to be unique per page (Critical for individual editing)
-                // This ensures "gender" on page 1 is different from "gender" on page 2
-                const genderRadios = page.querySelectorAll('input[name^="gender"]');
-                genderRadios.forEach(radio => {
-                    radio.name = `gender_${index}`;
-                });
-
-                const handRadios = page.querySelectorAll('input[name^="dominantHand"]');
-                handRadios.forEach(radio => {
-                    radio.name = `dominantHand_${index}`;
-                });
-            });
-        }
-
-        // Updates the disable state of delete buttons across all pages
-        function updateDeleteButtons() {
-            const allPages = document.querySelectorAll('.a4-page');
-            const deleteButtons = document.querySelectorAll('.delete-page-btn');
-            const isSinglePage = allPages.length === 1;
-
-            deleteButtons.forEach(btn => {
-                btn.disabled = isSinglePage;
-                btn.title = isSinglePage ? 'ไม่สามารถลบหน้าสุดท้ายได้' : 'ลบหน้านี้';
-            });
-
-            // Ensure input reflects actual count
-            const pageCountInput = document.getElementById('pageCountInput');
-            if(pageCountInput) pageCountInput.value = allPages.length;
-        }
-
-        // Function to set the total number of pages
-        function setTotalPages(targetCount) {
-            let existingPages = document.querySelectorAll('.a4-page');
-            const currentCount = existingPages.length;
-
-            if (targetCount === currentCount) return;
-            if (targetCount < 1) targetCount = 1;
-
-            // Get sync status and initial date from the first page before potentially removing it
-            const firstPage = existingPages[0];
-            const firstPageSyncCheckbox = firstPage ? firstPage.querySelector('.sync-date-checkbox') : null;
-            const isSyncDate = firstPageSyncCheckbox ? firstPageSyncCheckbox.checked : false;
-            const firstPageDateValue = firstPage ? firstPage.querySelector('.testDateHidden').value : '';
-
-
-            // Remove excess pages
-            if (targetCount < currentCount) {
-                for (let i = currentCount; i > targetCount; i--) {
-                    existingPages[i - 1].remove();
-                }
-            } 
-            // Add missing pages
-            else if (targetCount > currentCount) {
-                // Find the existing pages again, as some might have been removed or we need the template
-                existingPages = document.querySelectorAll('.a4-page');
-                const pageTemplate = existingPages[0]; 
-                
-                for (let i = currentCount; i < targetCount; i++) {
-                    // Deep clone the template page
-                    const newPage = pageTemplate.cloneNode(true);
-                    
-                    // Clear inputs for the new page
-                    clearPageInputs(newPage);
-                    
-                    // Initialize or sync date on the new page
-                    const newDateControl = newPage.querySelector('.date-control');
-                    if (newDateControl) {
-                        initializeDateControl(newDateControl); // Initialize to today first
-                    }
-
-                    // Apply sync settings to new page
-                    const newSyncCheckbox = newPage.querySelector('.sync-date-checkbox');
-                    if (newSyncCheckbox) newSyncCheckbox.checked = isSyncDate;
-                    
-                    // If sync is active, overwrite with the first page's date
-                    if (isSyncDate && firstPageDateValue) {
-                        const newDateInput = newPage.querySelector('.testDateHidden');
-                        const newDateDisplay = newPage.querySelector('.testDateDisplay');
-                        if(newDateInput) newDateInput.value = firstPageDateValue;
-                        if(newDateDisplay) newDateDisplay.value = formatDateToThai(firstPageDateValue);
-                    }
-
-                    // Re-run radio logic on clone to ensure visuals match state
-                    // Since clearPageInputs already runs and unchecks everything, 
-                    // this block is now redundant, but kept as a safeguard.
-                    newPage.querySelectorAll('.checkbox-option').forEach(label => {
-                        const radio = label.querySelector('input[type="radio"]');
-                        const box = label.querySelector('.checkbox-box');
-                        if (radio && box) {
-                            if (radio.checked) {
-                                box.classList.add('checked');
-                            } else {
-                                box.classList.remove('checked');
-                            }
-                        }
-                    });
-
-                    // Insert the new page after the last one
-                    let lastPage = document.querySelectorAll('.a4-page');
-                    lastPage = lastPage[lastPage.length - 1];
-                    lastPage.after(newPage);
-                }
-            }
-            
-            updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
-        }
-
-        // Function to handle the button click and input (Apply)
-        function applyPageCount() {
-            const input = document.getElementById('pageCountInput');
-            let count = parseInt(input.value);
-
-            if (isNaN(count) || count < 1) {
-                count = 1;
-                input.value = 1;
-            }
-
-            setTotalPages(count);
-        }
-
-        // Function to handle removing a specific page
-        function deletePage(buttonElement) {
-            const allPages = document.querySelectorAll('.a4-page');
-            
-            if (allPages.length > 1) {
-                const pageNum = Array.from(allPages).indexOf(buttonElement.closest('.a4-page')) + 1;
-                
-                showCustomConfirm(`ยืนยันการลบหน้า ${pageNum} หรือไม่? ข้อมูลทั้งหมดในหน้าจะถูกลบ`, (confirmed) => {
-                    if (confirmed) {
-                        const page = buttonElement.closest('.a4-page');
-                        page.remove();
-                        updatePageNumbering(); updateDeleteButtons(); syncCenterSelection();
-                    }
-                });
-            } else {
-                showCustomAlert('ไม่สามารถลบหน้าสุดท้ายได้');
-            }
-        }
-        
-        // Function to handle custom radio selection
+        // --- Radio Logic (Supports Uncheck) ---
         function toggleRadio(labelElement, event) {
-            // Prevent default label click behavior (which forces radio check)
-            // This is CRITICAL for allowing uncheck
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
+            if (event) { event.preventDefault(); event.stopPropagation(); }
             const inputRadio = labelElement.querySelector('input[type="radio"]');
             const parentControl = labelElement.closest('.checkbox-control');
             const currentBox = labelElement.querySelector('.checkbox-box');
-
             if (!inputRadio) return;
 
-            // Check current visual state (use class because input state might be tricky with default events)
-            const isChecked = currentBox.classList.contains('checked');
+            const isAlreadyChecked = currentBox.classList.contains('checked');
 
-            // Reset ALL radios in this group (both visually and internally)
             parentControl.querySelectorAll('input[type="radio"]').forEach(radio => {
                 radio.checked = false;
-                const box = radio.closest('.checkbox-option').querySelector('.checkbox-box');
-                if (box) box.classList.remove('checked');
+                radio.closest('.checkbox-option').querySelector('.checkbox-box').classList.remove('checked');
             });
 
-            // Logic: Toggle. If it wasn't checked before, check it now.
-            // If it WAS checked, we effectively unchecked it in the reset step above.
-            if (!isChecked) {
+            if (!isAlreadyChecked) {
                 inputRadio.checked = true;
                 currentBox.classList.add('checked');
             }
         }
 
-        // --- NEW FUNCTION: Set Gender For All Pages ---
-        function setAllGender(genderValue) {
-            const allPages = document.querySelectorAll('.a4-page');
-            
-            allPages.forEach(page => {
-                // Find the radio button with the specified value (male/female)
-                // We use name^="gender" because names are unique (gender_0, gender_1...)
-                const targetRadio = page.querySelector(`input[value="${genderValue}"][name^="gender"]`);
-                
-                if (targetRadio) {
-                    // Check it
-                    targetRadio.checked = true;
-                    
-                    // Update visuals
-                    const parentControl = targetRadio.closest('.checkbox-control');
-                    if (parentControl) {
-                        parentControl.querySelectorAll('input[type="radio"]').forEach(radio => {
-                            const box = radio.closest('.checkbox-option').querySelector('.checkbox-box');
-                            if (radio.checked) {
-                                box.classList.add('checked');
-                            } else {
-                                box.classList.remove('checked');
-                            }
-                        });
-                    }
-                }
-            });
-            
-            // showCustomAlert(`ตั้งค่าเพศทั้งหมดเป็น "${genderValue === 'male' ? 'ชาย' : 'หญิง'}" เรียบร้อยแล้ว`);
-        }
-
-        // Function to clear only imported fields (now clears all fields with data-field attribute)
-        function clearImportedData() {
-            const allPages = document.querySelectorAll('.a4-page');
-            
-            showCustomConfirm('ยืนยันการล้างข้อมูลที่นำเข้า (ชื่อเล่น, ชื่อจริง, อายุ, สัดส่วน, 20M/CR10) จากทุกหน้าหรือไม่?', (confirmed) => {
-                if (confirmed) {
-                    allPages.forEach(page => {
-                        page.querySelectorAll('[data-field]').forEach(input => {
-                            input.value = '';
-                        });
+        function syncDateCheckboxes(sourceCheckbox) {
+            const isChecked = sourceCheckbox.checked;
+            document.querySelectorAll('.sync-date-checkbox').forEach(cb => cb.checked = isChecked);
+            if (isChecked) {
+                const dateVal = sourceCheckbox.closest('.a4-page').querySelector('.testDateHidden').value;
+                if (dateVal) {
+                    document.querySelectorAll('.testDateHidden').forEach(input => {
+                        input.value = dateVal;
+                        input.closest('.date-control').querySelector('.testDateDisplay').value = formatDateToThai(dateVal);
                     });
-                    showCustomAlert('ล้างข้อมูลที่นำเข้าทั้งหมดเรียบร้อยแล้ว');
                 }
+            }
+        }
+
+        function handleDateChange(hiddenInput) {
+            const iso = hiddenInput.value;
+            hiddenInput.closest('.date-control').querySelector('.testDateDisplay').value = formatDateToThai(iso);
+            const sync = hiddenInput.closest('.a4-page').querySelector('.sync-date-checkbox');
+            if (sync && sync.checked) {
+                document.querySelectorAll('.testDateHidden').forEach(input => {
+                    input.value = iso;
+                    input.closest('.date-control').querySelector('.testDateDisplay').value = formatDateToThai(iso);
+                });
+            }
+        }
+
+        function syncCenterSelection(val) {
+            document.querySelectorAll('.trainingCenterSelect').forEach(s => s.value = val);
+        }
+
+        function updatePageNumbering() {
+            document.querySelectorAll('.a4-page').forEach((page, i) => {
+                const num = (i + 1).toString().padStart(3, '0');
+                
+                // Only auto-fill if empty to allow Excel overwrite, OR always overwrite if we treat Excel as source of truth.
+                // However, since we import Excel data *after* creating pages, we can let processExcelData overwrite these.
+                // But for manual add page, we want auto numbering.
+                
+                const seq = page.querySelector('.sequence-number-input');
+                const res = page.querySelector('.research-id-input');
+                
+                // Basic auto-numbering (will be overwritten by Excel import if data exists)
+                if (seq && !seq.value) seq.value = num;
+                if (res && !res.value) res.value = `ช${num}`;
+                
+                page.querySelectorAll('input[name^="gender"]').forEach(r => r.name = `gender_${i}`);
+                page.querySelectorAll('input[name^="dominantHand"]').forEach(r => r.name = `hand_${i}`);
             });
         }
 
-        // === Excel Import Functions ===
-        
+        function setTotalPages(target) {
+            let pages = document.querySelectorAll('.a4-page');
+            const current = pages.length;
+            if (target === current) return;
+            const container = document.querySelector('.page-container');
+
+            if (target < current) {
+                for (let i = current - 1; i >= target; i--) pages[i].remove();
+            } else {
+                const template = pages[0];
+                for (let i = current; i < target; i++) {
+                    const clone = template.cloneNode(true);
+                    // Reset inputs
+                    clone.querySelectorAll('input:not([type="checkbox"]), select').forEach(input => {
+                        if (!input.classList.contains('trainingCenterSelect')) input.value = '';
+                    });
+                    clone.querySelectorAll('.checkbox-box').forEach(box => box.classList.remove('checked'));
+                    clone.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+                    container.appendChild(clone);
+                }
+            }
+            updatePageNumbering();
+            document.getElementById('pageCountInput').value = document.querySelectorAll('.a4-page').length;
+        }
+
+        function applyPageCount() {
+            const val = parseInt(document.getElementById('pageCountInput').value);
+            if (val > 0) setTotalPages(val);
+        }
+
+        function deletePage(btn) {
+            if (document.querySelectorAll('.a4-page').length > 1) {
+                showCustomConfirm("ยืนยันการลบหน้านี้หรือไม่?", (ok) => {
+                    if (ok) { btn.closest('.a4-page').remove(); updatePageNumbering(); }
+                });
+            } else {
+                showCustomAlert("ไม่สามารถลบหน้าสุดท้ายได้");
+            }
+        }
+
+        function setAllGender(val) {
+            document.querySelectorAll('.a4-page').forEach(page => {
+                const radio = page.querySelector(`input[value="${val}"][name^="gender"]`);
+                if (radio) toggleRadio(radio.closest('.checkbox-option'));
+            });
+        }
+
+        // === EXCEL IMPORT LOGIC (UPDATED) ===
         function handleFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
                 showCustomAlert('กรุณาเลือกไฟล์ Excel (.xlsx หรือ .xls) เท่านั้น');
                 event.target.value = '';
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
@@ -783,8 +355,8 @@
                     const dataRows = json.slice(1); 
                     processExcelData(dataRows);
                 } catch (error) {
-                    console.error("Error processing Excel file:", error);
-                    showCustomAlert(`เกิดข้อผิดพลาดในการประมวลผลไฟล์ Excel: ${error.message}.`);
+                    console.error(error);
+                    showCustomAlert(`เกิดข้อผิดพลาด: ${error.message}`);
                 }
                 event.target.value = '';
             };
@@ -793,92 +365,90 @@
 
         function processExcelData(data) {
             if (data.length === 0) {
-                showCustomAlert('ไม่พบข้อมูลที่จะนำเข้า กรุณาตรวจสอบเนื้อหาในไฟล์ Excel');
+                showCustomAlert('ไม่พบข้อมูลในไฟล์ Excel');
                 return;
             }
 
             const requiredPages = data.length;
-            setTotalPages(requiredPages); // Ensure enough pages exist
+            setTotalPages(requiredPages); 
             const allPages = document.querySelectorAll('.a4-page');
-            const importedCount = data.length;
             
             data.forEach((row, index) => {
                 const page = allPages[index];
                 if (!page) return;
                 
-                const getValue = (col) => (row[col] !== undefined && row[col] !== null) ? String(row[col]).trim() : '';
-                const getNumberValue = (col) => {
-                    const val = getValue(col);
-                    const cleanedVal = val.replace(/[^0-9.]/g, ''); 
-                    const num = parseFloat(cleanedVal);
-                    return isNaN(num) ? NaN : num;
-                };
-                const getInput = (field) => page.querySelector(`[data-field="${field}"]`);
+                const getValue = (colIndex) => (row[colIndex] !== undefined && row[colIndex] !== null) ? String(row[colIndex]).trim() : '';
+                const getInput = (selector) => page.querySelector(selector);
 
-                // 1. Calculate Average Height from Index 3 and 4
-                const height1 = getNumberValue(3); 
-                const height2 = getNumberValue(4);
-                let calculatedHeight = '';
-                if (!isNaN(height1) && !isNaN(height2)) { 
-                    calculatedHeight = ((height1 + height2) / 2).toFixed(1); 
-                } else if (!isNaN(height1)) { 
-                    calculatedHeight = height1.toFixed(1);
-                } else if (!isNaN(height2)) { 
-                    calculatedHeight = height2.toFixed(1); 
+                // --- 1. Sequence Number (Col A -> Index 0) ---
+                const seqVal = getValue(0);
+                const seqInput = getInput('.sequence-number-input');
+                if (seqInput) seqInput.value = seqVal;
+
+                // --- 2. Fullname (Col B -> Index 1) ---
+                const nameInput = getInput('[data-field="fullname"]');
+                if (nameInput) nameInput.value = getValue(1);
+
+                // --- 3. Nickname (Col C -> Index 2) ---
+                const nickInput = getInput('[data-field="nickname"]');
+                if (nickInput) nickInput.value = getValue(2);
+
+                // --- 4. Age (Col D -> Index 3) ---
+                const ageInput = getInput('[data-field="age"]');
+                if (ageInput) ageInput.value = getValue(3).replace(/[^0-9.]/g, '');
+
+                // --- 5. Research ID (Col E -> Index 4) ---
+                const resInput = getInput('.research-id-input');
+                if (resInput) resInput.value = getValue(4);
+
+                // --- 6. Gender (Col G -> Index 6) ---
+                const genderVal = getValue(6).toLowerCase();
+                let genderRadio = null;
+                
+                // Identify target radio
+                if (genderVal.includes('ชาย') || genderVal === 'male' || genderVal === 'm') {
+                    genderRadio = page.querySelector('input[name^="gender"][value="male"]');
+                } else if (genderVal.includes('หญิง') || genderVal === 'female' || genderVal === 'f') {
+                    genderRadio = page.querySelector('input[name^="gender"][value="female"]');
                 }
-                
-                // 2. General Info Mapping
-                const fullname = getValue(0); 
-                const nickname = getValue(1); 
-                const age = getValue(2);
-                if (getInput('fullname')) { getInput('fullname').value = fullname; }
-                if (getInput('nickname')) { getInput('nickname').value = nickname; }
-                if (getInput('age')) { getInput('age').value = age.replace(/[^0-9.]/g, ''); }
-                if (getInput('height')) { getInput('height').value = calculatedHeight; } 
-                
-                // 3. Body Composition (Waist, Hip) - Columns 5 to 8
-                if (getInput('waist1')) { getInput('waist1').value = getValue(5); }
-                if (getInput('waist2')) { getInput('waist2').value = getValue(6); }
-                if (getInput('hip1')) { getInput('hip1').value = getValue(7); }
-                if (getInput('hip2')) { getInput('hip2').value = getValue(8); }
 
-                // 4. Fitness Tests (20M, CR10) - Columns 9 to 11
-                if (getInput('20m-laps')) { getInput('20m-laps').value = getValue(9); }
-                if (getInput('cr10-cardio')) { getInput('cr10-cardio').value = getValue(10); }
-                if (getInput('cr10-muscle')) { getInput('cr10-muscle').value = getValue(11); }
+                // Apply check if found
+                if (genderRadio) {
+                    const parentControl = genderRadio.closest('.checkbox-control');
+                    // Reset group first
+                    parentControl.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+                    parentControl.querySelectorAll('.checkbox-box').forEach(b => b.classList.remove('checked'));
+                    
+                    // Check target
+                    genderRadio.checked = true;
+                    const box = genderRadio.closest('.checkbox-option').querySelector('.checkbox-box');
+                    if (box) box.classList.add('checked');
+                }
             });
 
-            showCustomAlert(`นำเข้าข้อมูลสำเร็จ: พบ ${importedCount} รายการ และได้เติมข้อมูลทั้งหมดลงในเอกสาร ${importedCount} หน้าเรียบร้อยแล้ว`);
+            showCustomAlert(`นำเข้าข้อมูลสำเร็จ: ${data.length} รายการ`);
         }
-        
-        // === END Excel Import Functions ===
 
-        // Initialize event listeners and page count on load
-        window.onload = () => {
-            // Initialize pages and numbering
-            setTotalPages(1); 
-        };
+        window.onload = () => { setTotalPages(1); };
     </script>
 </head>
 <body>
 
-    <!-- Custom Modal/Alert Overlay and Structure -->
+    <!-- Custom Modal -->
     <div id="custom-modal-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-70 z-[100] hidden"></div>
     <div id="custom-modal" class="fixed inset-0 flex items-center justify-center z-[101] hidden">
-        <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm mx-4" role="dialog" aria-modal="true">
-            <div class="text-lg font-semibold mb-4 text-gray-900">การแจ้งเตือน</div>
+        <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm mx-4">
+            <div class="text-lg font-semibold mb-4 text-gray-900">แจ้งเตือน</div>
             <p id="modal-message" class="text-gray-700 mb-6"></p>
             <div class="flex justify-end gap-3">
-                <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md transition hidden">ยกเลิก</button>
-                <button id="modal-confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition">ตกลง</button>
+                <button id="modal-cancel-btn" class="bg-gray-300 hover:bg-gray-400 py-2 px-4 rounded-md">ยกเลิก</button>
+                <button id="modal-confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">ตกลง</button>
             </div>
         </div>
     </div>
-    <!-- End Custom Modal -->
 
-    <!-- Floating Buttons Container -->
+    <!-- Controls -->
     <div class="fixed top-4 right-4 no-print z-50 flex flex-col items-end gap-3">
-
         <!-- Import Data Controls -->
         <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex flex-col gap-2">
             <h4 class="text-xs font-bold text-gray-500 text-center uppercase tracking-wider">ควบคุมข้อมูล</h4>
@@ -895,60 +465,39 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Gender Bulk Control -->
+
         <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex flex-col gap-2 w-full">
-            <h4 class="text-xs font-bold text-gray-500 text-center uppercase tracking-wider">เลือกเพศ (ทั้งหมด)</h4>
+            <h4 class="text-xs font-bold text-gray-500 text-center uppercase">เลือกเพศ (ทั้งหมด)</h4>
             <div class="flex gap-2">
-                 <button onclick="setAllGender('male')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm flex-1">ชาย</button>
-                 <button onclick="setAllGender('female')" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm flex-1">หญิง</button>
+                 <button onclick="setAllGender('male')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md text-sm flex-1">ชาย</button>
+                 <button onclick="setAllGender('female')" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-1 px-3 rounded-md text-sm flex-1">หญิง</button>
             </div>
         </div>
-        
-        <!-- Page Control Input (Set Total Pages) -->
         <div class="bg-white p-2 rounded-lg shadow-xl border border-gray-300 flex items-center gap-2">
-            <label for="pageCountInput" class="text-sm font-semibold text-gray-700 whitespace-nowrap">จำนวนหน้าทั้งหมด:</label>
-            <input type="number" id="pageCountInput" value="1" min="1" class="w-12 text-center border rounded-md p-1 text-gray-800" style="outline: none; border-color: #d1d5db;">
-            <button onclick="applyPageCount()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-md shadow transition text-sm">
-                ปรับใช้
-            </button>
+            <label class="text-sm font-semibold">จำนวนหน้า:</label>
+            <input type="number" id="pageCountInput" value="1" min="1" class="w-12 text-center border rounded-md">
+            <button onclick="applyPageCount()" class="bg-green-600 text-white font-bold py-1 px-3 rounded-md text-sm">ปรับใช้</button>
         </div>
-
-        <!-- Print Button -->
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-xl flex items-center gap-2 transition">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            พิมพ์เอกสาร
+            พิมพ์เอกสาร (PDF)
         </button>
     </div>
 
-    <!-- A4 Paper Container -->
     <div class="page-container">
-        <!-- Initial Page Template -->
         <div class="a4-page flex flex-col">
-            
-            <!-- Delete Page Button (Absolute position, Top-Left) -->
-            <button onclick="deletePage(this)" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-md shadow-lg transition delete-page-btn no-print" title="ลบหน้านี้">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                ลบหน้า
-            </button>
+            <button onclick="deletePage(this)" class="bg-red-600 text-white font-bold py-1 px-3 rounded-md delete-page-btn no-print">ลบหน้า</button>
 
-            <!-- Page Frame Wrapper (New) -->
             <div class="page-frame">
-                <!-- Document Content -->
                 <div>
-                    <!-- Header -->
-                    <div class="text-center mb-6">
+                    <div class="text-center mb-4">
                         <h1 class="text-2xl font-bold uppercase tracking-wider mb-1 text-gray-900">แบบบันทึกข้อมูลการทดสอบสมรรถภาพ</h1>
                         <h2 class="text-lg text-gray-600 font-light">(Data Collection Record Sheet)</h2>
                     </div>
 
-                    <!-- Training Center Name (Dropdown) -->
                     <div class="mb-4 flex items-end justify-center px-4 header-info">
-                        <span class="font-bold text-base mr-2 whitespace-nowrap text-gray-800">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
-                        <select 
-                            class="input-line flex-1 text-center font-bold text-base cursor-pointer trainingCenterSelect" 
-                            onchange="syncCenterSelection(this.value)"
-                        >
+                        <span class="font-bold text-base mr-2 whitespace-nowrap">ศูนย์ฝึกและอบรมเด็กและเยาวชน:</span>
+                        <select class="input-line flex-1 trainingCenterSelect" onchange="syncCenterSelection(this.value)">
                             <option value="" disabled selected>--- เลือกศูนย์ฯ ---</option>
                             <option value="ระยอง">ระยอง</option>
                             <option value="ราชบุรี">ราชบุรี</option>
@@ -959,267 +508,119 @@
                         </select>
                     </div>
 
-                    <!-- Test Date Selector (Updated to use Classes for cloning support) -->
-                    <div class="mb-8 flex items-end justify-end px-4 header-info date-control">
-                        <!-- Sync Date Checkbox -->
-                        <label class="flex items-center mr-4 cursor-pointer select-none no-print">
-                            <input type="checkbox" class="w-4 h-4 mr-2 sync-date-checkbox accent-blue-600" onchange="syncDateCheckboxes(this)">
+                    <div class="mb-6 flex items-end justify-end px-4 date-control">
+                        <label class="flex items-center mr-4 cursor-pointer no-print">
+                            <input type="checkbox" class="w-3 h-3 mr-2 sync-date-checkbox" onchange="syncDateCheckboxes(this)">
                             <span class="text-xs font-semibold text-gray-700">ใช้วันที่เดียวกันทุกหน้า</span>
                         </label>
-
-                        <span class="font-bold text-base mr-4 whitespace-nowrap text-gray-800">วันที่ทำการทดสอบ (Test Date):</span>
-                        <!-- Custom Date Input with Icon -->
-                        <div class="relative w-40 flex items-center">
-                            <!-- Visible Input for Thai Format (pr-8 for icon space) -->
-                            <input type="text" class="input-date w-full text-base pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
-                            
-                            <!-- Calendar Icon (Visual only) -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="absolute right-1 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            
-                            <!-- Hidden Date Input (Overlays the entire area to capture click and open picker) -->
-                            <input 
-                                type="date" 
-                                class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" 
-                                onchange="handleDateChange(this)" 
-                                style="height: 100%; border: none; z-index: 10;"
-                            >
+                        <span class="font-bold text-base mr-4">วันที่ทดสอบ:</span>
+                        <div class="relative w-36">
+                            <input type="text" class="input-date w-full pr-8 testDateDisplay" placeholder="วัน/เดือน/ปี" readonly>
+                            <input type="date" class="absolute inset-0 w-full opacity-0 cursor-pointer testDateHidden" onchange="handleDateChange(this)">
                         </div>
                     </div>
 
-                    <!-- Section 1: General Info -->
-                    <div class="mb-8 border border-black p-5 rounded-md">
-                        <h3 class="font-bold text-lg mb-4 keep-together text-gray-800">1. ข้อมูลทั่วไป (General Information) </h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ลำดับที่:</span>
-                                <!-- Input for automatic numbering -->
-                                <input type="text" class="input-line sequence-number-input" readonly>
-                            </div>
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">รหัสวิจัย:</span>
-                                <!-- Input for automatic numbering -->
-                                <input type="text" class="input-line research-id-input" readonly>
-                            </div>
+                    <!-- Section 1 -->
+                    <div class="mb-6 border border-black p-4 rounded-md">
+                        <h3 class="font-bold text-lg mb-3">1. ข้อมูลทั่วไป (General Information)</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div class="flex items-end"><span class="font-semibold w-20 text-sm">ลำดับที่:</span><input type="text" class="input-line sequence-number-input" readonly></div>
+                            <div class="flex items-end"><span class="font-semibold w-20 text-sm">รหัสวิจัย:</span><input type="text" class="input-line research-id-input" readonly></div>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ชื่อจริง:</span>
-                                <!-- MAPPED: Column 0 -->
-                                <input type="text" class="input-line" data-field="fullname">
-                            </div>
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">ชื่อเล่น:</span>
-                                <!-- MAPPED: Column 1 -->
-                                <input type="text" class="input-line" data-field="nickname">
-                            </div>
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div class="flex items-end"><span class="font-semibold w-20 text-sm">ชื่อจริง:</span><input type="text" class="input-line" data-field="fullname"></div>
+                            <div class="flex items-end"><span class="font-semibold w-20 text-sm">ชื่อเล่น:</span><input type="text" class="input-line" data-field="nickname"></div>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-3 flex-col-mobile">
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold w-24 text-gray-700 text-base">อายุ:</span>
-                                <div class="flex w-full items-end">
-                                    <!-- MAPPED: Column 2 -->
-                                    <input type="number" class="input-line" data-field="age">
-                                    <span class="ml-2 text-gray-700 text-base">ปี</span>
-                                </div>
-                            </div>
-                            <div></div> <!-- Placeholder to keep layout even -->
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5 mt-4">
+                        <div class="grid grid-cols-3 gap-4 mt-4">
                             <div class="flex items-center checkbox-control">
-                                <span class="font-semibold mr-4 w-16 text-gray-700 text-base">เพศ:</span>
-                                <!-- REFACTORED to use hidden RADIO input -->
-                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this, event)">
-                                    <input type="radio" name="gender" value="male" class="hidden">
-                                    <span class="checkbox-box"></span> ชาย
+                                <span class="font-semibold mr-2 text-sm">เพศ:</span>
+                                <label class="checkbox-option mr-2 checkbox-group" onclick="toggleRadio(this, event)">
+                                    <input type="radio" name="gender" value="male" class="hidden"><span class="checkbox-box"></span> ชาย
                                 </label>
-                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this, event)">
-                                    <input type="radio" name="gender" value="female" class="hidden">
-                                    <span class="checkbox-box"></span> หญิง
+                                <label class="checkbox-option checkbox-group" onclick="toggleRadio(this, event)">
+                                    <input type="radio" name="gender" value="female" class="hidden"><span class="checkbox-box"></span> หญิง
                                 </label>
                             </div>
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700 text-base">ส่วนสูง:</span>
-                                <!-- MAPPED: Column 3 (T1) and 4 (T2) -> Calculated Average -->
-                                <input type="number" class="input-line" data-field="height">
-                                <span class="ml-2 text-gray-700 text-base">ซม.</span>
-                            </div>
-                            <div class="flex items-end">
-                                <span class="whitespace-nowrap font-semibold mr-2 text-gray-700 text-base">น้ำหนัก:</span>
-                                <input type="number" class="input-line">
-                                <span class="ml-2 text-gray-700 text-base">กก.</span>
-                            </div>
+                            <div class="flex items-end"><span class="font-semibold mr-1 text-sm">ส่วนสูง:</span><input type="number" class="input-line w-12" data-field="height"><span class="text-xs ml-1">ซม.</span></div>
+                            <div class="flex items-end"><span class="font-semibold mr-1 text-sm">น้ำหนัก:</span><input type="number" class="input-line w-12"><span class="text-xs ml-1">กก.</span></div>
                         </div>
                     </div>
 
-                    <!-- Section 2: Body Composition -->
-                    <div class="mb-8">
-                        <h3 class="font-bold text-lg mb-2 keep-together text-gray-800">2. สัดส่วนร่างกาย (Body Composition)</h3>
-                        <table class="label-table">
-                            <colgroup>
-                                <col style="width: 40%;">
-                                <col style="width: 30%;">
-                                <col style="width: 30%;">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="keep-together">รายการ (Item)</th>
-                                    <th>Trial 1 (cm)</th>
-                                    <th>Trial 2 (cm)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบเอว (Waist)</td>
-                                    <!-- MAPPED: Column 5 and 6 -->
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist1"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="waist2"></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-semibold keep-together py-3 text-gray-700">เส้นรอบสะโพก (Hip)</td>
-                                    <!-- MAPPED: Column 7 and 8 -->
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip1"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent" data-field="hip2"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Section 3: Handgrip Strength -->
-                    <div class="mb-8">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
-                            <h3 class="font-bold text-lg keep-together mb-2 md:mb-0 text-gray-800">3. Handgrip Strength Test</h3>
-                            <div class="flex items-center checkbox-control">
-                                <span class="font-semibold mr-3 text-gray-700 whitespace-nowrap text-base">ข้างที่ถนัด (Dominant):</span>
-                                <!-- REFACTORED to use hidden RADIO input -->
-                                <label class="checkbox-group mr-4 checkbox-option" onclick="toggleRadio(this, event)">
-                                    <input type="radio" name="dominantHand" value="right" class="hidden">
-                                    <span class="checkbox-box"></span> ขวา
-                                </label>
-                                <label class="checkbox-group checkbox-option" onclick="toggleRadio(this, event)">
-                                    <input type="radio" name="dominantHand" value="left" class="hidden">
-                                    <span class="checkbox-box"></span> ซ้าย
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <table class="label-table">
-                            <colgroup>
-                                <col style="width: 25%;">
-                                <col style="width: 25%;">
-                                <col style="width: 25%;">
-                                <col style="width: 25%;">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="keep-together py-2">ข้าง (Side)</th>
-                                    <th class="py-2">Trial 1 (kg)</th>
-                                    <th class="py-2">Trial 2 (kg)</th>
-                                    <th class="py-2">Trial 3 (kg)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="font-semibold keep-together py-3 text-gray-700">Dominant<br>(ข้างถนัด)</td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-semibold keep-together py-3 text-gray-700">Non-Dominant<br>(ไม่ถนัด)</td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                    <td><input type="text" class="w-full text-center outline-none bg-transparent"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Section 4: Back-Leg Dynamometer -->
-                    <div class="mb-8">
-                        <h3 class="font-bold text-lg mb-2 keep-together text-gray-800">4. Back-Leg Dynamometer Test</h3>
-                        <table>
-                            <colgroup>
-                                <col style="width: 33.33%;">
-                                <col style="width: 33.33%;">
-                                <col style="width: 33.33%;">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="py-2">Trial 1 (kg)</th>
-                                    <th class="py-2">Trial 2 (kg)</th>
-                                    <th class="py-2">Trial 3 (kg)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="h-14">
-                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                                    <td><input type="text" class="w-full h-full text-center outline-none bg-transparent text-lg font-bold"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Section 5: Cardio & CR10 (RE-ADDED and STYLED) -->
+                    <!-- Section 2 -->
                     <div class="mb-6">
-                        <h3 class="font-bold text-lg mb-3 keep-together text-gray-800">5. ความทนทานระบบหัวใจและไหลเวียนเลือดและระดับความเหนื่อย</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 section-5-grid">
-                            
-                            <!-- 20M-SRT (Updated to boxed style) -->
-                            <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-base">
-                                    20M-SRT Test (20m Shuttle Run Test)
-                                </div>
-                                <div class="p-6 text-center bg-gray-50">
-                                    <label class="block text-sm font-semibold mb-3 text-black keep-together">จำนวนรอบสะสม (Cumulative Laps)</label>
-                                    <div class="flex justify-center items-end gap-2">
-                                        <!-- MAPPED: Column 9 -->
-                                        <input 
-                                            type="number" 
-                                            min="0" 
-                                            class="border border-gray-400 w-24 h-12 text-center rounded-lg text-black text-lg font-bold"
-                                            data-field="20m-laps"
-                                        >
-                                        <span class="mb-1 text-xl text-gray-700">รอบ</span>
-                                    </div>
+                        <h3 class="font-bold text-lg mb-2">2. สัดส่วนร่างกาย (Body Composition)</h3>
+                        <table class="label-table">
+                            <thead>
+                                <tr><th class="w-1/2">รายการ</th><th class="w-1/4">Trial 1 (cm)</th><th class="w-1/4">Trial 2 (cm)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="font-semibold py-2">เส้นรอบเอว (Waist)</td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td></tr>
+                                <tr><td class="font-semibold py-2">เส้นรอบสะโพก (Hip)</td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 3 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-lg">3. Handgrip Strength Test</h3>
+                            <div class="flex items-center checkbox-control">
+                                <span class="font-semibold mr-2 text-sm">ข้างที่ถนัด:</span>
+                                <label class="checkbox-option mr-2 checkbox-group" onclick="toggleRadio(this, event)">
+                                    <input type="radio" name="dominantHand" value="right" class="hidden"><span class="checkbox-box"></span> ขวา
+                                </label>
+                                <label class="checkbox-option checkbox-group" onclick="toggleRadio(this, event)">
+                                    <input type="radio" name="dominantHand" value="left" class="hidden"><span class="checkbox-box"></span> ซ้าย
+                                </label>
+                            </div>
+                        </div>
+                        <table class="label-table">
+                            <thead>
+                                <tr><th class="w-1/4">ข้าง (Side)</th><th class="w-1/4">Trial 1 (kg)</th><th class="w-1/4">Trial 2 (kg)</th><th class="w-1/4">Trial 3 (kg)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="font-semibold py-3">ข้างถนัด (Dominant)</td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td></tr>
+                                <tr><td class="font-semibold py-3">ไม่ถนัด (Non-Dom)</td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td><td><input type="text" class="w-full bg-transparent"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 4 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-lg mb-2">4. Back-Leg Dynamometer Test</h3>
+                        <table>
+                            <thead>
+                                <tr><th class="w-1/3">Trial 1 (kg)</th><th class="w-1/3">Trial 2 (kg)</th><th class="w-1/3">Trial 3 (kg)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="h-12"><td><input type="text" class="w-full bg-transparent font-bold"></td><td><input type="text" class="w-full bg-transparent font-bold"></td><td><input type="text" class="w-full bg-transparent font-bold"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Section 5 -->
+                    <div>
+                        <h3 class="font-bold text-lg mb-2">5. ความทนทานหัวใจและเหนื่อย (20M-SRT)</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="border border-black rounded-lg overflow-hidden">
+                                <div class="bg-gray-200 p-1 text-center font-bold text-xs">จำนวนรอบสะสม</div>
+                                <div class="p-4 flex justify-center items-end gap-2">
+                                    <input type="number" class="border border-gray-400 w-16 h-10 text-center rounded text-lg font-bold">
+                                    <span class="text-sm">รอบ</span>
                                 </div>
                             </div>
-
-                            <!-- CR10 Scale -->
-                            <div class="border border-black rounded-md overflow-hidden shadow-lg section-5-box">
-                                <div class="bg-gray-200 p-3 text-center font-bold border-b border-black text-base">
-                                    CR10 Scale (ระดับความเหนื่อย)
-                                </div>
-                                <div class="p-6 grid grid-cols-2 gap-6 bg-gray-50">
-                                    <div class="text-center">
-                                        <label class="block text-xs font-semibold mb-2 text-black keep-together">Cardio (เหนื่อย/หอบ)</label>
-                                        <div class="flex justify-center items-center gap-1">
-                                            <!-- MAPPED: Column 10 -->
-                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-lg font-bold" data-field="cr10-cardio">
-                                            <span class="text-black ml-1 text-base">/10</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-center">
-                                        <label class="block text-xs font-semibold mb-2 text-black keep-together">Muscle (ล้า/เมื่อย)</label>
-                                        <div class="flex justify-center items-center gap-1">
-                                            <!-- MAPPED: Column 11 -->
-                                            <input type="number" min="0" max="10" class="border border-gray-400 w-16 h-12 text-center rounded-lg text-black text-lg font-bold" data-field="cr10-muscle">
-                                            <span class="text-black ml-1 text-base">/10</span>
-                                        </div>
-                                    </div>
+                            <div class="border border-black rounded-lg overflow-hidden">
+                                <div class="bg-gray-200 p-1 text-center font-bold text-xs">ระดับความเหนื่อย (CR10)</div>
+                                <div class="p-3 grid grid-cols-2 gap-2">
+                                    <div class="text-center"><span class="text-[10px] block">Cardio</span><input type="number" class="border border-gray-300 w-10 text-center"></div>
+                                    <div class="text-center"><span class="text-[10px] block">Muscle</span><input type="number" class="border border-gray-300 w-10 text-center"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> <!-- End Page Frame -->
-
+            </div>
         </div>
     </div>
-
 </body>
 </html>
